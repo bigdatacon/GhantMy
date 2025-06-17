@@ -119,6 +119,26 @@ void GanttView::populateScene() {
             m_scene->addItem(bar);
         }
     }
+//    // Установка границ сцены — предотвращает уход за пределы
+//    // Установка границ сцены — добавим запас по ширине и высоте
+//    int sceneWidth = spacingX + timeUnit * 11;
+//    int sceneHeight = yOffset + spacingY * machineCount;
+
+//    // Добавим небольшой запас (например, по 200 пикселей)
+//    m_scene->setSceneRect(-200, -200, sceneWidth + 400, sceneHeight + 400);
+
+    constexpr int paddingX = 500;
+    constexpr int paddingY = 200;
+
+    int sceneWidth = spacingX + timeUnit * 11;
+    int sceneHeight = yOffset + spacingY * machineCount;
+
+    QRectF contentRect(0, 0, sceneWidth, sceneHeight);
+    m_scene->setSceneRect(contentRect.adjusted(-paddingX, -paddingY, paddingX, paddingY));
+
+
+
+
 }
 
 void GanttView::wheelEvent(QWheelEvent *event) {
