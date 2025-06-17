@@ -59,7 +59,8 @@ OBJECTS       = GanttBarItem.o \
 		GanttView.o \
 		main.o \
 		moc_GanttView.o
-DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
+DIST          = ../.gitignore \
+		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/sanitize.conf \
@@ -452,7 +453,7 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 
 ####### Compile
 
-GanttBarItem.o: ../GanttBarItem.cpp 
+GanttBarItem.o: ../GanttBarItem.cpp ../GanttBarItem.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o GanttBarItem.o ../GanttBarItem.cpp
 
 GanttView.o: ../GanttView.cpp ../GanttView.h \
