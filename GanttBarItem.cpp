@@ -48,12 +48,14 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QBrush>
 
-GanttBarItem::GanttBarItem(int machineId, int jobId, int startTime, int duration, int timeUnit, int offsetX, int offsetY)
+GanttBarItem::GanttBarItem(int machineId, int jobId, int startTime, int duration, int timeUnit, int offsetX, int offsetY, int passedBarHeight)
     : m_defaultColor(Qt::blue)
 {
     int x = offsetX + startTime * timeUnit;
     int width = duration * timeUnit;
-    int height = 20;
+//    int height = 20;
+    int height = passedBarHeight; // Переданный аргумент
+
     setRect(x, offsetY, width, height);
     setBrush(m_defaultColor);
     setFlag(ItemIsMovable);

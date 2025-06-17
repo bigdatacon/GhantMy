@@ -26,6 +26,8 @@
 class GanttBarItem : public QGraphicsRectItem {
 public:
     GanttBarItem(int machineId, int jobId, int startTime, int duration, int timeUnit, int offsetX, int offsetY);
+    GanttBarItem(int machineId, int jobId, int startTime, int duration, int timeUnit, int offsetX, int offsetY, int passedBarHeight);
+
 
     void setHighlighted(bool on);
 

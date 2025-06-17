@@ -1,19 +1,3 @@
-//#pragma once
-//#include <QGraphicsView>
-//#include <QGraphicsScene>
-
-//class GanttView : public QGraphicsView {
-//    Q_OBJECT
-//public:
-//    GanttView(QWidget *parent = nullptr);
-
-//protected:
-//    void wheelEvent(QWheelEvent *event) override;
-
-//private:
-//    QGraphicsScene *m_scene;
-//};
-
 
 #pragma once
 #include <QGraphicsView>
@@ -27,9 +11,15 @@ public:
 
 protected:
     void wheelEvent(QWheelEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
     QGraphicsScene *m_scene;
     QString m_title;
+    bool m_bInitialized = false;
+
     void populateScene();  // Добавляет оси, бары, подписи
 };
+
+
+
