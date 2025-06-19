@@ -62,6 +62,7 @@ OBJECTS       = GanttBarItem.o \
 		main.o \
 		moc_GanttView.o
 DIST          = ../.gitignore \
+		../operations.json \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -467,7 +468,8 @@ GanttView.o: ../GanttView.cpp ../GanttView.h \
 		../GanttBarItem.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o GanttView.o ../GanttView.cpp
 
-main.o: ../main.cpp ../GanttView.h
+main.o: ../main.cpp ../GanttView.h \
+		../GanttDB.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../main.cpp
 
 moc_GanttView.o: moc_GanttView.cpp 

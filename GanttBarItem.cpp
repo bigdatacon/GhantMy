@@ -63,6 +63,23 @@ GanttBarItem::GanttBarItem(int machineId, int jobId, int startTime, int duration
     setAcceptHoverEvents(true);
 }
 
+
+GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration, int timeUnit, int offsetX, int offsetY, int passedBarHeight)
+    : m_defaultColor(Qt::blue)
+{
+    int x = offsetX + startTime * timeUnit;
+    int width = duration * timeUnit;
+//    int height = 20;
+    int height = passedBarHeight; // Переданный аргумент
+
+    setRect(x, offsetY, width, height);
+    setBrush(m_defaultColor);
+    setFlag(ItemIsMovable);
+    setFlag(ItemSendsGeometryChanges);
+    setAcceptHoverEvents(true);
+}
+
+
 void GanttBarItem::setHighlighted(bool on) {
     setBrush(on ? Qt::red : m_defaultColor);
 }

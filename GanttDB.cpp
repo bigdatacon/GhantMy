@@ -1,90 +1,124 @@
 // GanttDB.cpp
 #include "GanttDB.h"
-#include <QSqlQuery>
-#include <QSqlError>
-#include <QDebug>
 
-GanttDB::GanttDB(const QString &dbPath) {
-    m_db = QSqlDatabase::addDatabase("QSQLITE");
-    m_db.setDatabaseName(dbPath);
+GanttDB::GanttDB() {
+    connectDatabase();
 }
 
-bool GanttDB::initialize() {
-    if (!m_db.open()) {
-        qDebug() << "Cannot open DB:" << m_db.lastError().text();
-        return false;
+void GanttDB::connectDatabase() {
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("gantt.db");
+    if (!db.open()) {
+        qWarning() << "Не удалось открыть БД:" << db.lastError().text();
     }
-    return createTables();
-}
-
-bool GanttDB::createTables() {
     QSqlQuery query;
-    const QString ddl = R"(
-        CREATE TABLE IF NOT EXISTS %1 (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            machine_id INTEGER,
-            job_id INTEGER,
-            start_time INTEGER,
+    query.exec("DROP TABLE IF EXISTS operations");
+    query.exec(R"(
+        CREATE TABLE operations (
+            id TEXT PRIMARY KEY,
+            machineId INTEGER,
+            jobId INTEGER,
+            startTime INTEGER,
             duration INTEGER,
-            setup_time INTEGER,
+            setupTime INTEGER,
+            name TEXT,
+            cost INTEGER,
             predecessors TEXT
         )
-    )";
-    return query.exec(ddl.arg("TopChartData")) && query.exec(ddl.arg("BottomChartData"));
+    )");
 }
 
-void GanttDB::populateSampleData() {
-    QSqlQuery q;
-    q.exec("DELETE FROM TopChartData");
-    q.exec("DELETE FROM BottomChartData");
+void GanttDB::loadFromJson(const QString &filename) {
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning() << "Не удалось открыть JSON файл:" << filename;
+        return;
+    }
+    QByteArray data = file.readAll();
+    file.close();
 
-    for (int m = 0; m < 3; ++m) {
-        for (int j = 0; j < 3; ++j) {
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    QJsonObject root = doc.object();
+    QJsonArray topArray = root["top"].toArray();
+    QJsonArray bottomArray = root["bottom"].toArray();
+
+    auto parseArray = [](const QJsonArray &array) {
+        QVector<OperationData> result;
+        for (const auto &val : array) {
+            QJsonObject obj = val.toObject();
             OperationData op;
-            op.machineId = m;
-            op.jobId = j;
-            op.startTime = (j + m) * 2;
-            op.duration = 2 + (j % 2);
-            op.setupTime = op.duration / 2;
-            op.predecessors = QStringList();
+            op.id = obj["id"].toString();
+            op.machineId = obj["machineId"].toInt();
+            op.jobId = obj["jobId"].toInt();
+            op.startTime = obj["startTime"].toInt();
+            op.duration = obj["duration"].toInt();
+            op.setupTime = obj["setupTime"].toInt();
+            op.name = obj["name"].toString();
+            op.cost = obj["cost"].toInt();
+//            op.predecessors = obj["predecessors"].toString().split(",", QString::SkipEmptyParts);
+            op.predecessors = obj["predecessors"].toString().split(",", Qt::SkipEmptyParts);
+//            op.predecessors = query.value("predecessors").toString().split(",", Qt::SkipEmptyParts);
 
-            if (j == 2) {
-                op.predecessors << QString::number((m * 3) + 1) << QString::number(((m - 1) * 3));
-            }
-            insertOperation("TopChartData", op);
-            insertOperation("BottomChartData", op);
+
+            result.append(op);
         }
-    }
+        return result;
+    };
+
+    topOperations = parseArray(topArray);
+    bottomOperations = parseArray(bottomArray);
 }
 
-void GanttDB::insertOperation(const QString &tableName, const OperationData &data) {
+void GanttDB::writeToDatabase() {
     QSqlQuery query;
-    query.prepare(QString("INSERT INTO %1 (machine_id, job_id, start_time, duration, setup_time, predecessors) "
-                         "VALUES (?, ?, ?, ?, ?, ?)").arg(tableName));
-    query.addBindValue(data.machineId);
-    query.addBindValue(data.jobId);
-    query.addBindValue(data.startTime);
-    query.addBindValue(data.duration);
-    query.addBindValue(data.setupTime);
-    query.addBindValue(data.predecessors.join(","));
-    if (!query.exec()) {
-        qDebug() << "Insert error:" << query.lastError();
-    }
+    auto insertOps = [&query](const QVector<OperationData> &ops) {
+        for (const auto &op : ops) {
+            query.prepare(R"(
+                INSERT INTO operations (id, machineId, jobId, startTime, duration, setupTime, name, cost, predecessors)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            )");
+            query.addBindValue(op.id);
+            query.addBindValue(op.machineId);
+            query.addBindValue(op.jobId);
+            query.addBindValue(op.startTime);
+            query.addBindValue(op.duration);
+            query.addBindValue(op.setupTime);
+            query.addBindValue(op.name);
+            query.addBindValue(op.cost);
+            query.addBindValue(op.predecessors.join(","));
+            if (!query.exec()) {
+                qWarning() << "Ошибка вставки в БД:" << query.lastError().text();
+            }
+        }
+    };
+    insertOps(topOperations);
+    insertOps(bottomOperations);
 }
 
-QVector<OperationData> GanttDB::loadTable(const QString &tableName) {
-    QVector<OperationData> data;
-    QSqlQuery query(QString("SELECT id, machine_id, job_id, start_time, duration, setup_time, predecessors FROM %1").arg(tableName));
+
+void GanttDB::loadFromDatabase() {
+    topOperations.clear();
+    bottomOperations.clear();
+
+    QSqlQuery query("SELECT * FROM operations");
     while (query.next()) {
         OperationData op;
-        op.id = query.value(0).toInt();
-        op.machineId = query.value(1).toInt();
-        op.jobId = query.value(2).toInt();
-        op.startTime = query.value(3).toInt();
-        op.duration = query.value(4).toInt();
-        op.setupTime = query.value(5).toInt();
-        op.predecessors = query.value(6).toString().split(",", Qt::SkipEmptyParts);
-        data.append(op);
+        op.id = query.value("id").toString();
+        op.machineId = query.value("machineId").toInt();
+        op.jobId = query.value("jobId").toInt();
+        op.startTime = query.value("startTime").toInt();
+        op.duration = query.value("duration").toInt();
+        op.setupTime = query.value("setupTime").toInt();
+        op.name = query.value("name").toString();
+        op.cost = query.value("cost").toInt();
+//        op.predecessors = query.value("predecessors").toString().split(",", QString::SkipEmptyParts);
+//        op.predecessors = obj["predecessors"].toString().split(",", Qt::SkipEmptyParts);
+        op.predecessors = query.value("predecessors").toString().split(",", Qt::SkipEmptyParts);
+
+
+        if (op.id.endsWith("_up"))
+            topOperations.append(op);
+        else if (op.id.endsWith("_down"))
+            bottomOperations.append(op);
     }
-    return data;
 }

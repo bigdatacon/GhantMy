@@ -2,30 +2,46 @@
 #pragma once
 #include <QString>
 #include <QVector>
-#include <QSqlDatabase>
 #include <QStringList>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QFile>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QVariant>
+#include <QDebug>
 
 
 struct OperationData {
-    int id;
+    QString id;
     int machineId;
     int jobId;
     int startTime;
     int duration;
     int setupTime;
-    QStringList predecessors; // Строка вида "1,4,6"
+    QString name;
+    int cost;
+    QStringList predecessors;
 };
 
 class GanttDB {
 public:
-    GanttDB(const QString &dbPath);
-    bool initialize();
-    void populateSampleData();
+    QVector<OperationData> topOperations;
+    QVector<OperationData> bottomOperations;
 
-    QVector<OperationData> loadTable(const QString &tableName);
-    void insertOperation(const QString &tableName, const OperationData &data);
+    static GanttDB& instance() {
+        static GanttDB inst;
+        return inst;
+    }
+
+    void loadFromJson(const QString &filename);
+    void writeToDatabase();
+    void loadFromDatabase();
 
 private:
-    QSqlDatabase m_db;
-    bool createTables();
+    GanttDB();
+    void connectDatabase();
+    QSqlDatabase db;
 };

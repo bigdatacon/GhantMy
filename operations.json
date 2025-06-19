@@ -1,0 +1,19 @@
+{
+  "top": [
+    { "id": "1_up", "machineId": 1, "jobId": 1, "startTime": 0, "duration": 4, "setupTime": 2, "predecessors": [], "name": "Op1", "cost": 100 },
+    { "id": "2_up", "machineId": 1, "jobId": 3, "startTime": 4, "duration": 3, "setupTime": 1, "predecessors": ["1_up"], "name": "Op2", "cost": 120 },
+    { "id": "3_up", "machineId": 2, "jobId": 1, "startTime": 0, "duration": 5, "setupTime": 2, "predecessors": [], "name": "Op3", "cost": 110 },
+    { "id": "4_up", "machineId": 2, "jobId": 2, "startTime": 5, "duration": 3, "setupTime": 1, "predecessors": ["3_up"], "name": "Op4", "cost": 90 },
+    { "id": "5_up", "machineId": 3, "jobId": 1, "startTime": 0, "duration": 4, "setupTime": 2, "predecessors": [], "name": "Op5", "cost": 95 },
+    { "id": "6_up", "machineId": 3, "jobId": 2, "startTime": 4, "duration": 2, "setupTime": 1, "predecessors": [], "name": "Op6", "cost": 85 },
+    { "id": "7_up", "machineId": 3, "jobId": 3, "startTime": 6, "duration": 3, "setupTime": 1, "predecessors": ["5_up", "2_up"], "name": "Op7", "cost": 130 }
+  ],
+  "bottom": [
+    { "id": "1_down", "machineId": 1, "jobId": 1, "startTime": 0, "duration": 4, "setupTime": 2, "predecessors": [], "name": "Op8", "cost": 100 },
+    { "id": "2_down", "machineId": 2, "jobId": 1, "startTime": 4, "duration": 3, "setupTime": 1, "predecessors": ["1_down"], "name": "Op9", "cost": 110 },
+    { "id": "3_down", "machineId": 2, "jobId": 2, "startTime": 0, "duration": 4, "setupTime": 2, "predecessors": [], "name": "Op10", "cost": 105 },
+    { "id": "4_down", "machineId": 3, "jobId": 2, "startTime": 4, "duration": 3, "setupTime": 1, "predecessors": ["3_down"], "name": "Op11", "cost": 95 },
+    { "id": "5_down", "machineId": 1, "jobId": 3, "startTime": 0, "duration": 4, "setupTime": 2, "predecessors": [], "name": "Op12", "cost": 90 },
+    { "id": "6_down", "machineId": 3, "jobId": 3, "startTime": 4, "duration": 2, "setupTime": 1, "predecessors": ["5_down"], "name": "Op13", "cost": 100 }
+  ]
+}
