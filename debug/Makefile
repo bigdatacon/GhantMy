@@ -14,10 +14,10 @@ EQ            = =
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_QML_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
+DEFINES       = -DQT_QML_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -g -std=gnu++1z -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I../../GhantMy -I. -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
+INCPATH       = -I../../GhantMy -I. -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
 QMAKE         = /usr/lib/qt5/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -40,7 +40,7 @@ DISTNAME      = GhantMy1.0.0
 DISTDIR = /home/user1/GhantMy/debug/.tmp/GhantMy1.0.0
 LINK          = g++
 LFLAGS        = 
-LIBS          = $(SUBLIBS) /usr/lib/x86_64-linux-gnu/libQt5Widgets.so /usr/lib/x86_64-linux-gnu/libQt5Gui.so /usr/lib/x86_64-linux-gnu/libQt5Core.so -lGL -lpthread   
+LIBS          = $(SUBLIBS) /usr/lib/x86_64-linux-gnu/libQt5Widgets.so /usr/lib/x86_64-linux-gnu/libQt5Gui.so /usr/lib/x86_64-linux-gnu/libQt5Sql.so /usr/lib/x86_64-linux-gnu/libQt5Core.so -lGL -lpthread   
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -53,9 +53,11 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = ../GanttBarItem.cpp \
+		../GanttDB.cpp \
 		../GanttView.cpp \
 		../main.cpp moc_GanttView.cpp
 OBJECTS       = GanttBarItem.o \
+		GanttDB.o \
 		GanttView.o \
 		main.o \
 		moc_GanttView.o
@@ -162,7 +164,9 @@ DIST          = ../.gitignore \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		../../GhantMy.pro ../GanttBarItem.h \
+		../GanttDB.h \
 		../GanttView.h ../GanttBarItem.cpp \
+		../GanttDB.cpp \
 		../GanttView.cpp \
 		../main.cpp
 QMAKE_TARGET  = GhantMy
@@ -396,8 +400,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../GanttBarItem.h ../GanttView.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../GanttBarItem.cpp ../GanttView.cpp ../main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../GanttBarItem.h ../GanttDB.h ../GanttView.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../GanttBarItem.cpp ../GanttDB.cpp ../GanttView.cpp ../main.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -435,7 +439,7 @@ compiler_moc_header_clean:
 moc_GanttView.cpp: ../GanttView.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/user1/GhantMy/debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/user1/GhantMy -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../GanttView.h -o moc_GanttView.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/user1/GhantMy/debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/user1/GhantMy -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../GanttView.h -o moc_GanttView.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -455,6 +459,9 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 
 GanttBarItem.o: ../GanttBarItem.cpp ../GanttBarItem.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o GanttBarItem.o ../GanttBarItem.cpp
+
+GanttDB.o: ../GanttDB.cpp ../GanttDB.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o GanttDB.o ../GanttDB.cpp
 
 GanttView.o: ../GanttView.cpp ../GanttView.h \
 		../GanttBarItem.h

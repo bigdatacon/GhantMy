@@ -1,4 +1,6 @@
 QT       += core gui
+QT += sql
+
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -10,11 +12,13 @@ CONFIG += c++17
 
 SOURCES += \
     GanttBarItem.cpp \
+    GanttDB.cpp \
     GanttView.cpp \
     main.cpp
 
 HEADERS += \
     GanttBarItem.h \
+    GanttDB.h \
     GanttView.h
 
 FORMS +=
