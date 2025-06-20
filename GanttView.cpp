@@ -8,39 +8,6 @@
 #include <QSet>
 
 
-//GanttView::GanttView(const QString &title, QWidget *parent)
-//    : QGraphicsView(parent), m_scene(new QGraphicsScene(this)), m_title(title)
-//{
-//    setScene(m_scene);
-//    setRenderHint(QPainter::Antialiasing);
-//    setDragMode(QGraphicsView::ScrollHandDrag);
-////    setTransformationAnchor(AnchorUnderMouse);
-//    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-
-
-////    populateScene();
-//}
-
-
-//GanttView::GanttView(const QString &title, const QVector<OperationData> &operations, GanttDB* db, QWidget *parent)
-//    : QGraphicsView(parent), m_scene(new QGraphicsScene(this)), m_title(title), m_operations(operations), m_pDB(db)
-//{
-//    setScene(m_scene);
-//    setRenderHint(QPainter::Antialiasing);
-//    setDragMode(QGraphicsView::ScrollHandDrag);
-//    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-//}
-
-
-//GanttView::GanttView(const QString &title, const QVector<OperationData> &operations, GanttDB* db, QWidget *parent)
-//    : QGraphicsView(parent), m_scene(new QGraphicsScene(this)), m_title(title), m_operations(operations), m_pDB(db)
-//{
-//    setScene(m_scene);
-//    setRenderHint(QPainter::Antialiasing);
-//    setDragMode(QGraphicsView::ScrollHandDrag);
-//    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-//    generateJobColorMap();
-//}
 
 GanttView::GanttView(const QString &title, const QVector<OperationData> &operations, GanttDB* db, int maxFinishTime, int uniqueJobCount)
     : QGraphicsView(), m_title(title), m_operations(operations), m_pDB(db), m_maxFinishTime(maxFinishTime), m_uniqueJobCount(uniqueJobCount) {
