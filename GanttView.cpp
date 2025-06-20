@@ -5,21 +5,31 @@
 #include <QGraphicsTextItem>
 #include <QWheelEvent>
 #include <QDebug>
+#include <QSet>
 
 
+//GanttView::GanttView(const QString &title, QWidget *parent)
+//    : QGraphicsView(parent), m_scene(new QGraphicsScene(this)), m_title(title)
+//{
+//    setScene(m_scene);
+//    setRenderHint(QPainter::Antialiasing);
+//    setDragMode(QGraphicsView::ScrollHandDrag);
+////    setTransformationAnchor(AnchorUnderMouse);
+//    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 
-GanttView::GanttView(const QString &title, QWidget *parent)
-    : QGraphicsView(parent), m_scene(new QGraphicsScene(this)), m_title(title)
-{
-    setScene(m_scene);
-    setRenderHint(QPainter::Antialiasing);
-    setDragMode(QGraphicsView::ScrollHandDrag);
-//    setTransformationAnchor(AnchorUnderMouse);
-    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+
+////    populateScene();
+//}
 
 
-//    populateScene();
-}
+//GanttView::GanttView(const QString &title, const QVector<OperationData> &operations, GanttDB* db, QWidget *parent)
+//    : QGraphicsView(parent), m_scene(new QGraphicsScene(this)), m_title(title), m_operations(operations), m_pDB(db)
+//{
+//    setScene(m_scene);
+//    setRenderHint(QPainter::Antialiasing);
+//    setDragMode(QGraphicsView::ScrollHandDrag);
+//    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+//}
 
 
 GanttView::GanttView(const QString &title, const QVector<OperationData> &operations, GanttDB* db, QWidget *parent)
@@ -29,113 +39,26 @@ GanttView::GanttView(const QString &title, const QVector<OperationData> &operati
     setRenderHint(QPainter::Antialiasing);
     setDragMode(QGraphicsView::ScrollHandDrag);
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    generateJobColorMap();
 }
 
 
-//void GanttView::populateScene() {
-//    m_scene->clear();
+void GanttView::generateJobColorMap() {
+    QSet<int> uniqueJobIds;
+    for (const auto& op : m_pDB->topOperations)
+        uniqueJobIds.insert(op.jobId);
+    for (const auto& op : m_pDB->bottomOperations)
+        uniqueJobIds.insert(op.jobId);
 
-//    int viewWidth = viewport()->width();
-//    int viewHeight = viewport()->height();
+    QList<int> sortedIds = uniqueJobIds.values();
+    std::sort(sortedIds.begin(), sortedIds.end());
 
-//    const int machineCount = 3;
-//    const int tasksPerMachine = 3;
-
-//    int spacingX = viewWidth / 20;
-//    int titleHeight = viewHeight / 12;
-//    int topPadding = viewHeight / 10;
-//    int bottomPadding = viewHeight / 10;
-
-//    int availableHeight = viewHeight - titleHeight - topPadding - bottomPadding;
-//    int spacingY = availableHeight / machineCount;
-//    int barHeight = spacingY * 0.2;
-
-//    int maxFinishTime = 0;
-//    for (int m = 0; m < machineCount; ++m) {
-//        for (int j = 0; j < tasksPerMachine; ++j) {
-//            int startTime = (j + m) * 2;
-//            int duration = 2 + (j % 2);
-//            int finishTime = startTime + duration;
-//            if (finishTime > maxFinishTime) maxFinishTime = finishTime;
-//        }
-//    }
-
-//    int timeUnit = (viewWidth - spacingX * 2) / maxFinishTime;
-//    int baseFontSize = std::min(viewWidth, viewHeight) / 30;
-//    int yOffset = titleHeight + topPadding + baseFontSize;
-
-//    // Заголовок
-//    QGraphicsTextItem *titleItem = new QGraphicsTextItem(m_title);
-//    QFont titleFont;
-//    titleFont.setBold(true);
-//    titleFont.setPointSize(baseFontSize);
-//    titleItem->setFont(titleFont);
-
-//    QFontMetricsF fm(titleFont);
-//    qreal titleWidth = fm.boundingRect(m_title).width();
-//    qreal centerX = viewWidth / 2 - titleWidth / 2;
-//    titleItem->setPos(centerX, 0);
-//    m_scene->addItem(titleItem);
-
-//    // Ось X
-//    for (int t = 0; t <= maxFinishTime; ++t) {
-//        int x = spacingX + t * timeUnit;
-//        qDebug() << "[AxisX] T" << t << ", X pos:" << x << ", Y start:" << yOffset << ", Y end:" << (yOffset + spacingY * machineCount);
-//        m_scene->addLine(x, yOffset, x, yOffset + spacingY * machineCount, QPen(Qt::lightGray));
-//        auto *label = new QGraphicsTextItem(QString::number(t));
-//        QFont labelFont;
-//        labelFont.setPointSize(baseFontSize * 0.8);
-//        label->setFont(labelFont);
-////        label->setPos(x - 5, yOffset - baseFontSize * 2.0);
-//        QFontMetricsF labelMetrics(labelFont);
-//        qreal labelWidth = labelMetrics.boundingRect(QString::number(t)).width();
-//        int labelY = yOffset - std::max(barHeight, baseFontSize) * 2;
-
-//        label->setPos(x - labelWidth / 2, labelY);
-
-//        qDebug() << "[Label] T" << t << ", Y pos:" << yOffset - baseFontSize * 2.0;
-//        m_scene->addItem(label);
-//    }
-
-//    // Ось Y и бары
-//    for (int m = 0; m < machineCount; ++m) {
-//        int y = yOffset + spacingY * m;
-//        m_scene->addLine(spacingX, y, spacingX + timeUnit * maxFinishTime, y, QPen(Qt::gray));
-
-//        auto *machineLabel = new QGraphicsTextItem(QString("М%1").arg(m + 1));
-//        QFont labelFont;
-//        labelFont.setPointSize(baseFontSize * 0.8);
-//        machineLabel->setFont(labelFont);
-//        machineLabel->setPos(5, y - barHeight / 2);
-//        m_scene->addItem(machineLabel);
-
-//        for (int j = 0; j < tasksPerMachine; ++j) {
-//            int startTime = (j + m) * 2;
-//            int duration = 2 + (j % 2);
-////            int barY = y + 1 - barHeight;  // Совмещение нижней границы бара с осью
-//            int barY = y -barHeight/2;  // Совмещение нижней границы бара с осью
-
-
-//            qDebug() << "[Bar] Machine M" << m+1
-//                     << ", Task J" << j
-//                     << ", Y pos (bar top):" << barY
-//                     << ", bar_height:" << barHeight
-//                     << ", axis_Y:" << y;
-////            auto *bar = new GanttBarItem(m, j, startTime, duration, timeUnit, spacingX, barY);
-//            auto *bar = new GanttBarItem(m, j, startTime, duration, timeUnit, spacingX, barY, barHeight);
-
-//            m_scene->addItem(bar);
-//        }
-//    }
-
-//    int sceneWidth = spacingX + timeUnit * (maxFinishTime + 1);
-//    int sceneHeight = yOffset + spacingY * machineCount;
-
-//    int paddingRight = viewWidth / 8;
-//    m_scene->setSceneRect(0, 0, sceneWidth + paddingRight, sceneHeight + bottomPadding);
-//}
-
-
+    for (int i = 0; i < sortedIds.size(); ++i) {
+        int hue = (i * 360 / sortedIds.size()) % 360;
+        QColor color = QColor::fromHsv(hue, 200, 255);
+        m_jobColorMap[sortedIds[i]] = color;
+    }
+}
 
 void GanttView::populateScene() {
     m_scene->clear();
@@ -161,9 +84,8 @@ void GanttView::populateScene() {
     int barHeight = spacingY * 0.2;
 
     int maxFinishTime = 0;
-    for (const auto& op : m_operations) {
+    for (const auto& op : m_pDB->topOperations + m_pDB->bottomOperations)
         maxFinishTime = std::max(maxFinishTime, op.startTime + op.duration);
-    }
 
     int timeUnit = (viewWidth - spacingX * 2) / std::max(1, maxFinishTime);
     int baseFontSize = std::min(viewWidth, viewHeight) / 30;
@@ -212,7 +134,10 @@ void GanttView::populateScene() {
             if (groupId != id) continue;
 
             int barY = y - barHeight / 2;
+            QColor color = m_jobColorMap.value(op.jobId, Qt::blue);
+
             auto *bar = new GanttBarItem(
+                op.id,
                 op.machineId,
                 op.jobId,
                 op.startTime,
@@ -220,10 +145,22 @@ void GanttView::populateScene() {
                 timeUnit,
                 spacingX,
                 barY,
-                barHeight
+                barHeight,
+                color
             );
             bar->setToolTip(QString("%1\nSetup: %2\nCost: %3").arg(op.name).arg(op.setupTime).arg(op.cost));
             m_scene->addItem(bar);
+
+            // Добавим текст прямо на бар (только для верхнего графика)
+            if (m_title.contains("Top")) {
+                QGraphicsTextItem* jobLabel = new QGraphicsTextItem(QString("J%1").arg(op.jobId));
+                QFont labelFont;
+                labelFont.setPointSize(baseFontSize * 0.6);
+                jobLabel->setFont(labelFont);
+                int barX = spacingX + op.startTime * timeUnit;
+                jobLabel->setPos(barX + 2, barY);  // немного вправо от начала бара
+                m_scene->addItem(jobLabel);
+            }
         }
     }
 
@@ -232,7 +169,6 @@ void GanttView::populateScene() {
     int paddingRight = viewWidth / 8;
     m_scene->setSceneRect(0, 0, sceneWidth + paddingRight, sceneHeight + bottomPadding);
 }
-
 
 
 void GanttView::wheelEvent(QWheelEvent *event) {

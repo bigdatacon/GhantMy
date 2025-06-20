@@ -40,7 +40,8 @@ public:
     GanttBarItem(int machineId, int jobId, int startTime, int duration, int timeUnit, int offsetX, int offsetY, int passedBarHeight);
 
     GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration, int timeUnit, int offsetX, int offsetY, int passedBarHeight);
-
+    GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
+                               int timeUnit, int offsetX, int offsetY, int barHeight, QColor color);
 
 
     void setHighlighted(bool on);
