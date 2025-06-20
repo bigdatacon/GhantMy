@@ -42,6 +42,15 @@ GanttView::GanttView(const QString &title, const QVector<OperationData> &operati
     generateJobColorMap();
 }
 
+GanttView::GanttView(const QString &title, const QVector<OperationData> &operations, GanttDB* db, int maxFinishTime, int uniqueJobCount)
+    : QGraphicsView(), m_title(title), m_operations(operations), m_pDB(db), m_maxFinishTime(maxFinishTime), m_uniqueJobCount(uniqueJobCount) {
+    m_scene = new QGraphicsScene(this);
+    setScene(m_scene);
+    setRenderHint(QPainter::Antialiasing);
+    setDragMode(QGraphicsView::ScrollHandDrag);
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+}
+
 
 void GanttView::generateJobColorMap() {
     QSet<int> uniqueJobIds;

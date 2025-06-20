@@ -12,7 +12,7 @@
 #include <QSqlError>
 #include <QVariant>
 #include <QDebug>
-
+#include <QSet>
 
 struct OperationData {
     QString id;
@@ -30,6 +30,10 @@ class GanttDB {
 public:
     QVector<OperationData> topOperations;
     QVector<OperationData> bottomOperations;
+    int maxFinishTop = 0;
+    int maxFinishBottom = 0;
+    int uniqueJobCountTop = 0;
+    int uniqueJobCountBottom = 0;
 
     static GanttDB& instance() {
         static GanttDB inst;

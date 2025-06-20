@@ -12,6 +12,8 @@ public:
     GanttView(const QString &title = "", QWidget *parent = nullptr);
 //    GanttView(const QString &title, const QVector<OperationData> &operations, GanttDB* db, QWidget *parent = nullptr);
     GanttView(const QString &title, const QVector<OperationData> &operations, GanttDB* db, QWidget *parent = nullptr);
+    GanttView(const QString &title, const QVector<OperationData> &operations, GanttDB* db, int maxFinishTime, int uniqueJobCount);
+
 
 
 
@@ -26,6 +28,9 @@ private:
     bool m_bInitialized = false;
     QVector<OperationData> m_operations;
     QMap<int, QColor> m_jobColorMap;
+
+    int m_maxFinishTime = 0;
+    int m_uniqueJobCount = 0;
 
     GanttDB* m_pDB = nullptr;
 
