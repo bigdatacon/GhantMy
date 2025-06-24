@@ -176,25 +176,31 @@ void GanttView::populateScene() {
                 int barX = spacingX + op.startTime * timeUnit;
                 jobLabel->setPos(barX + 2, barY);  // немного вправо от начала бара
                 m_scene->addItem(jobLabel);
-            } else {
-                QVector<OperationData> relatedTopOps = m_pDB->bottomOpIdToGroup.value(op.id);
-
-                QSet<int> machineSet;
-                for (const auto& relatedOp : relatedTopOps)
-                    machineSet.insert(relatedOp.machineId);
-
-                QStringList machineLabels;
-                for (int mid : machineSet)
-                    machineLabels << QString("M%1").arg(mid);
-
-                QGraphicsTextItem* machineLabel = new QGraphicsTextItem(machineLabels.join(","));
-                QFont labelFont;
-                labelFont.setPointSize(baseFontSize * 0.6);
-                machineLabel->setFont(labelFont);
-                int barX = spacingX + op.startTime * timeUnit;
-                machineLabel->setPos(barX + 2, barY);
-                m_scene->addItem(machineLabel);
             }
+        else {
+            QVector<OperationData> relatedTopOps = m_pDB->bottomOpIdToGroup.value(op.id);
+
+            QSet<int> machineSet;
+            for (const auto& relatedOp : relatedTopOps)
+                machineSet.insert(relatedOp.machineId);
+
+            // Преобразуем в список и сортируем
+            QList<int> sortedMachines = QList<int>::fromSet(machineSet);
+            std::sort(sortedMachines.begin(), sortedMachines.end());
+
+            QStringList machineLabels;
+            for (int mid : sortedMachines)
+                machineLabels << QString("M%1").arg(mid);
+
+            QGraphicsTextItem* machineLabel = new QGraphicsTextItem(machineLabels.join(","));
+            QFont labelFont;
+            labelFont.setPointSize(baseFontSize * 0.6);
+            machineLabel->setFont(labelFont);
+            int barX = spacingX + op.startTime * timeUnit;
+            machineLabel->setPos(barX + 2, barY);
+            m_scene->addItem(machineLabel);
+        }
+
 
 
 
