@@ -35,6 +35,18 @@ public:
     int uniqueJobCountTop = 0;
     int uniqueJobCountBottom = 0;
 
+
+    // Новые поля:
+    QMap<int, QSet<int>> topJobToMachines;                 // JobId → множество MachineId
+    QMap<int, QSet<int>> bottomJobToMachines;              // JobId → множество MachineId
+//    QMap<QString, QVector<OperationData>> topBarGroups;    // id_jobId_finishTime → операции
+//    QMap<QString, QVector<OperationData>> bottomBarGroups; // id_jobId_finishTime → операции
+
+    // Используется в populateScene для отображения подписей внутри баров
+    QMap<QString, QPair<QVector<OperationData>, QVector<OperationData>>> topOpIdToGroup;
+    QMap<QString, QVector<OperationData>> bottomOpIdToGroup;
+
+
     static GanttDB& instance() {
         static GanttDB inst;
         return inst;

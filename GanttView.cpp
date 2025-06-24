@@ -40,6 +40,13 @@ void GanttView::generateJobColorMap() {
 void GanttView::populateScene() {
     m_scene->clear();
 
+    QMultiMap<int, int> jobToMachines;
+    for (const auto& op : m_pDB->topOperations + m_pDB->bottomOperations) {
+        jobToMachines.insert(op.jobId, op.machineId);
+    }
+
+
+
     int viewWidth = viewport()->width();
     int viewHeight = viewport()->height();
 
@@ -100,6 +107,9 @@ void GanttView::populateScene() {
         m_scene->addLine(spacingX, y, spacingX + timeUnit * maxFinishTime, y, QPen(Qt::gray));
 
         auto *axisLabel = new QGraphicsTextItem(QString("%1%2").arg(m_title.contains("Top") ? "М" : "J").arg(id));
+
+
+
         QFont labelFont;
         labelFont.setPointSize(baseFontSize * 0.8);
         axisLabel->setFont(labelFont);
@@ -129,7 +139,36 @@ void GanttView::populateScene() {
             m_scene->addItem(bar);
 
             // Добавим текст прямо на бар (только для верхнего графика)
+//            if (m_title.contains("Top")) {
+//                QGraphicsTextItem* jobLabel = new QGraphicsTextItem(QString("J%1").arg(op.jobId));
+//                QFont labelFont;
+//                labelFont.setPointSize(baseFontSize * 0.6);
+//                jobLabel->setFont(labelFont);
+//                int barX = spacingX + op.startTime * timeUnit;
+//                jobLabel->setPos(barX + 2, barY);  // немного вправо от начала бара
+//                m_scene->addItem(jobLabel);
+//            }
+//            else {
+//                // Для нижнего графика показываем список машин, на которых работает эта jobId
+//                QList<int> machines = jobToMachines.values(op.jobId);
+//                QSet<int> uniqueMachines = QSet<int>::fromList(machines);
+//                QStringList machineLabels;
+//                for (int mid : uniqueMachines)
+//                    machineLabels << QString("M%1").arg(mid);
+
+//                QGraphicsTextItem* machineLabel = new QGraphicsTextItem(machineLabels.join(","));
+//                QFont labelFont;
+//                labelFont.setPointSize(baseFontSize * 0.6);
+//                machineLabel->setFont(labelFont);
+//                int barX = spacingX + op.startTime * timeUnit;
+//                machineLabel->setPos(barX + 2, barY);
+//                m_scene->addItem(machineLabel);
+
+//            }
+
+
             if (m_title.contains("Top")) {
+                // На верхнем графике показываем jobId (как было)
                 QGraphicsTextItem* jobLabel = new QGraphicsTextItem(QString("J%1").arg(op.jobId));
                 QFont labelFont;
                 labelFont.setPointSize(baseFontSize * 0.6);
@@ -137,7 +176,30 @@ void GanttView::populateScene() {
                 int barX = spacingX + op.startTime * timeUnit;
                 jobLabel->setPos(barX + 2, barY);  // немного вправо от начала бара
                 m_scene->addItem(jobLabel);
+            } else {
+                QVector<OperationData> relatedTopOps = m_pDB->bottomOpIdToGroup.value(op.id);
+
+                QSet<int> machineSet;
+                for (const auto& relatedOp : relatedTopOps)
+                    machineSet.insert(relatedOp.machineId);
+
+                QStringList machineLabels;
+                for (int mid : machineSet)
+                    machineLabels << QString("M%1").arg(mid);
+
+                QGraphicsTextItem* machineLabel = new QGraphicsTextItem(machineLabels.join(","));
+                QFont labelFont;
+                labelFont.setPointSize(baseFontSize * 0.6);
+                machineLabel->setFont(labelFont);
+                int barX = spacingX + op.startTime * timeUnit;
+                machineLabel->setPos(barX + 2, barY);
+                m_scene->addItem(machineLabel);
             }
+
+
+
+
+
         }
     }
 
