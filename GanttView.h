@@ -15,6 +15,13 @@ public:
     GanttView(const QString &title, const QVector<OperationData> &operations, GanttDB* db, int maxFinishTime, int uniqueJobCount);
 
 
+public slots:
+    void highlightRelatedGroup(const QString &opId, bool isTop);
+
+public:
+    bool isHighlighted() const;
+    QString getTitle() const { return m_title; }
+
 
 
 
@@ -36,6 +43,11 @@ private:
 
     void populateScene();  // Добавляет оси, бары, подписи
     void generateJobColorMap();
+
+
+//    void setHighlighted(bool on) { m_highlighted = on; update(); }
+//    bool isHighlighted() const { return m_highlighted; }
+
 };
 
 

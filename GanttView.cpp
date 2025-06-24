@@ -9,6 +9,7 @@
 
 
 
+
 GanttView::GanttView(const QString &title, const QVector<OperationData> &operations, GanttDB* db, int maxFinishTime, int uniqueJobCount)
     : QGraphicsView(), m_title(title), m_operations(operations), m_pDB(db), m_maxFinishTime(maxFinishTime), m_uniqueJobCount(uniqueJobCount) {
     m_scene = new QGraphicsScene(this);
@@ -241,4 +242,29 @@ void GanttView::resizeEvent(QResizeEvent *event) {
         populateScene();  // запускается только при первом реальном размере
     }
 }
+
+
+
+void GanttView::highlightRelatedGroup(const QString &opId, bool isTop) {
+    QSet<QString> idsToHighlight;
+
+    if (isTop) {
+        auto pair = m_pDB->topOpIdToGroup.value(opId);
+        for (const auto &op : pair.first)  idsToHighlight.insert(op.id);
+        for (const auto &op : pair.second) idsToHighlight.insert(op.id);
+    } else {
+        auto list = m_pDB->bottomOpIdToGroup.value(opId);
+        for (const auto &op : list) idsToHighlight.insert(op.id);
+        idsToHighlight.insert(opId);  // не забываем сам нижний bar
+    }
+
+    for (auto *item : m_scene->items()) {
+        if (auto *bar = qgraphicsitem_cast<GanttBarItem*>(item)) {
+            bar->setHighlighted(idsToHighlight.contains(bar->getOpId()));
+        }
+    }
+}
+
+
+
 
