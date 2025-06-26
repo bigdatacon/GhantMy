@@ -139,13 +139,13 @@ void GanttDB::loadFromJson(const QString &filename) {
         bottomOpIdToGroup[key] = topGroup;
     }
 
-    qDebug() << "После loadFromJson:";
-    qDebug() << "Top count:" << topOperations.size();
-    qDebug() << "Bottom count:" << bottomOperations.size();
-    qDebug() << "MaxFinishTop:" << maxFinishTop;
-    qDebug() << "MaxFinishBottom:" << maxFinishBottom;
-    qDebug() << "UniqueJobTop:" << uniqueJobCountTop;
-    qDebug() << "UniqueJobBottom:" << uniqueJobCountBottom;
+//    qDebug() << "После loadFromJson:";
+//    qDebug() << "Top count:" << topOperations.size();
+//    qDebug() << "Bottom count:" << bottomOperations.size();
+//    qDebug() << "MaxFinishTop:" << maxFinishTop;
+//    qDebug() << "MaxFinishBottom:" << maxFinishBottom;
+//    qDebug() << "UniqueJobTop:" << uniqueJobCountTop;
+//    qDebug() << "UniqueJobBottom:" << uniqueJobCountBottom;
 }
 
 

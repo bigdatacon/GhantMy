@@ -14,17 +14,6 @@
 #include <QDebug>
 #include <QSet>
 
-//struct OperationData {
-//    QString id;
-//    int machineId;
-//    int jobId;
-//    int startTime;
-//    int duration;
-//    int setupTime;
-//    QString name;
-//    int cost;
-//    QStringList predecessors;
-//};
 
 struct OperationData {
     QString id;
@@ -53,8 +42,6 @@ public:
     // Новые поля:
     QMap<int, QSet<int>> topJobToMachines;                 // JobId → множество MachineId
     QMap<int, QSet<int>> bottomJobToMachines;              // JobId → множество MachineId
-//    QMap<QString, QVector<OperationData>> topBarGroups;    // id_jobId_finishTime → операции
-//    QMap<QString, QVector<OperationData>> bottomBarGroups; // id_jobId_finishTime → операции
 
     // Используется в populateScene для отображения подписей внутри баров
     QMap<QString, QPair<QVector<OperationData>, QVector<OperationData>>> topOpIdToGroup;

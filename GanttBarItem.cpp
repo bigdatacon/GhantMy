@@ -4,7 +4,8 @@
 
 GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
                            int timeUnit, int offsetX, int offsetY, int passedBarHeight, QColor color,  bool isHighlighted):
-    m_defaultColor(Qt::blue),
+//    m_defaultColor(Qt::blue),
+    m_defaultColor(color),
     m_assignedColor(color),
     m_bisHighlighted(isHighlighted)
 {
@@ -16,36 +17,62 @@ GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, 
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
     setAcceptHoverEvents(true);
+    setHighlighted(isHighlighted);
 }
 
 
+
+//void GanttBarItem::setHighlighted(bool on) {
+//    setBrush(on ? Qt::red : m_defaultColor);
+//}
 
 void GanttBarItem::setHighlighted(bool on) {
-    setBrush(on ? Qt::red : m_defaultColor);
+    m_isManuallyHighlighted = on;
+    setBrush(on ? Qt::yellow : m_assignedColor);
 }
+
+
+//void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+//    m_dragStart = event->pos();
+//    setHighlighted(true);
+//    QGraphicsRectItem::mousePressEvent(event);
+//}
+
 
 void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     m_dragStart = event->pos();
-    setHighlighted(true);
+    m_isManuallyHighlighted = !m_isManuallyHighlighted;
+    setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
     QGraphicsRectItem::mousePressEvent(event);
 }
 
+
+
+
 //void GanttBarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 //    setHighlighted(false);
-//    QList<QGraphicsItem*> others = collidingItems();
-//    for (auto *item : others) {
+//    bool collided = false;
+
+//    for (auto *item : collidingItems()) {
 //        if (dynamic_cast<GanttBarItem*>(item)) {
-//            setBrush(Qt::darkRed);
+//            collided = true;
 //            break;
 //        }
 //    }
+
+//    // Если была коллизия — временно цвет → чёрный
+//    if (collided) {
+//        setBrush(Qt::black);
+//    } else {
+//        setBrush(m_assignedColor);  // вернуть оригинальный цвет
+//    }
+
 //    QGraphicsRectItem::mouseReleaseEvent(event);
 //}
 
-void GanttBarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
-    setHighlighted(false);
-    bool collided = false;
 
+void GanttBarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+    bool collided = false;
     for (auto *item : collidingItems()) {
         if (dynamic_cast<GanttBarItem*>(item)) {
             collided = true;
@@ -53,12 +80,16 @@ void GanttBarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
         }
     }
 
-    // Если была коллизия — временно цвет → чёрный
     if (collided) {
-        setBrush(Qt::black);
+        if (!m_isManuallyHighlighted)
+            setBrush(Qt::black);  // только если не вручную выделен
     } else {
-        setBrush(m_assignedColor);  // вернуть оригинальный цвет
+        // возвращаем нужный цвет
+        setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
     }
 
     QGraphicsRectItem::mouseReleaseEvent(event);
 }
+
+
+
