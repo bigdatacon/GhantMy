@@ -2,14 +2,23 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QBrush>
 #include <QGraphicsScene>
-
+#include "GanttDB.h"
+#include "GanttView.h"
 
 GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
                            int timeUnit, int offsetX, int offsetY, int passedBarHeight, QColor color,  bool isHighlighted):
 //    m_defaultColor(Qt::blue),
     m_defaultColor(color),
     m_assignedColor(color),
-    m_bisHighlighted(isHighlighted)
+    m_bisHighlighted(isHighlighted),
+
+
+   m_opId(id),
+   m_jobId(jobId),
+   m_startTime(startTime),
+   m_duration(duration)
+
+
 {
     int x = offsetX + startTime * timeUnit;
     int width = duration * timeUnit;
@@ -23,30 +32,13 @@ GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, 
 }
 
 
-
-//void GanttBarItem::setHighlighted(bool on) {
-//    setBrush(on ? Qt::red : m_defaultColor);
-//}
-
 void GanttBarItem::setHighlighted(bool on) {
     m_isManuallyHighlighted = on;
     setBrush(on ? Qt::yellow : m_assignedColor);
 }
 
 
-//void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-//    m_dragStart = event->pos();
-//    setHighlighted(true);
-//    QGraphicsRectItem::mousePressEvent(event);
-//}
 
-
-//void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-//    m_dragStart = event->pos();
-//    m_isManuallyHighlighted = !m_isManuallyHighlighted;
-//    setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
-//    QGraphicsRectItem::mousePressEvent(event);
-//}
 
 void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     m_dragStart = event->pos();
@@ -57,30 +49,25 @@ void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
 
     QGraphicsRectItem::mousePressEvent(event);
+
+
+    auto *scenePtr = scene();
+    if (!scenePtr) return;
+
+    QObject *view = scenePtr->parent();
+    auto *ganttView = qobject_cast<GanttView*>(view);
+
+    if (ganttView) {
+        ganttView->printLinkedOperations(m_opId, m_jobId);
+    }
+
+
+
 }
 
 
 
-//void GanttBarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
-//    setHighlighted(false);
-//    bool collided = false;
 
-//    for (auto *item : collidingItems()) {
-//        if (dynamic_cast<GanttBarItem*>(item)) {
-//            collided = true;
-//            break;
-//        }
-//    }
-
-//    // Если была коллизия — временно цвет → чёрный
-//    if (collided) {
-//        setBrush(Qt::black);
-//    } else {
-//        setBrush(m_assignedColor);  // вернуть оригинальный цвет
-//    }
-
-//    QGraphicsRectItem::mouseReleaseEvent(event);
-//}
 
 
 void GanttBarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {

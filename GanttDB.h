@@ -57,8 +57,8 @@ public:
     void writeToDatabase();
     void loadFromDatabase();
 
-    QMap<int, QVector<OperationData>> topBarGroups;
-    QMap<int, QVector<OperationData>> bottomBarGroups;
+//    QMap<int, QVector<OperationData>> topBarGroups;
+//    QMap<int, QVector<OperationData>> bottomBarGroups;
 
 private:
     GanttDB();

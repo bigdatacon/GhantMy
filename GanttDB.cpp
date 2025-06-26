@@ -44,15 +44,15 @@ void GanttDB::loadFromJson(const QString &filename) {
     QJsonArray topArray = root["top"].toArray();
     QJsonArray bottomArray = root["bottom"].toArray();
 
-    qDebug() << "TopArray size:" << topArray.size();
-    for (int i = 0; i < topArray.size(); ++i) {
-        qDebug() << "TopArray[" << i << "]:" << topArray[i];
-    }
+//    qDebug() << "TopArray size:" << topArray.size();
+//    for (int i = 0; i < topArray.size(); ++i) {
+//        qDebug() << "TopArray[" << i << "]:" << topArray[i];
+//    }
 
-    qDebug() << "BottomArray size:" << bottomArray.size();
-    for (int i = 0; i < bottomArray.size(); ++i) {
-        qDebug() << "BottomArray[" << i << "]:" << bottomArray[i];
-    }
+//    qDebug() << "BottomArray size:" << bottomArray.size();
+//    for (int i = 0; i < bottomArray.size(); ++i) {
+//        qDebug() << "BottomArray[" << i << "]:" << bottomArray[i];
+//    }
 
     auto parseArray = [](const QJsonArray &array, const QString &label) {
         QVector<OperationData> result;
@@ -74,9 +74,9 @@ void GanttDB::loadFromJson(const QString &filename) {
                 op.predecessors.append(p.toString());
             }
 
-            qDebug() << label << ":" << op.id << op.jobId << op.startTime << op.duration << (op.startTime + op.duration)
-                     << " machineId:" << op.machineId << " name:" << op.name << " cost:" << op.cost
-                     << " predecessors:" << op.predecessors << " isHighlighted : "<< op.isHighlighted;
+//            qDebug() << label << ":" << op.id << op.jobId << op.startTime << op.duration << (op.startTime + op.duration)
+//                     << " machineId:" << op.machineId << " name:" << op.name << " cost:" << op.cost
+//                     << " predecessors:" << op.predecessors << " isHighlighted : "<< op.isHighlighted;
 
             result.append(op);
         }
@@ -216,7 +216,7 @@ void GanttDB::writeToDatabase() {
     insertOps(topOperations, "top_operations");
     insertOps(bottomOperations, "bottom_operations");
 
-    qDebug() << "Данные успешно записаны в базу.";
+//    qDebug() << "Данные успешно записаны в базу.";
 }
 
 

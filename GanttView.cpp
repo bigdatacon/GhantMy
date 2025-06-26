@@ -175,10 +175,6 @@ void GanttView::populateScene() {
         }
 
 
-
-
-
-
         }
     }
 
@@ -229,5 +225,32 @@ void GanttView::mousePressEvent(QMouseEvent *event) {
     }
 
     QGraphicsView::mousePressEvent(event); // не забудьте вызвать базовый метод
+}
+
+
+void GanttView::printLinkedOperations(const QString &opId, int jobId) {
+    if (!m_pDB) return;
+
+    qDebug() << "=== Связанные операции для jobId =" << jobId << ", opId =" << opId << "===";
+
+    for (const auto &pair : m_pDB->topOpIdToGroup) {
+        for (const auto &op : pair.first + pair.second) {
+            if (op.id == opId) continue;
+            if (op.jobId == jobId) {
+                qDebug() << "Top: id=" << op.id << "machineId=" << op.machineId
+                         << "start=" << op.startTime << "dur=" << op.duration;
+            }
+        }
+    }
+
+    for (const auto &list : m_pDB->bottomOpIdToGroup) {
+        for (const auto &op : list) {
+            if (op.id == opId) continue;
+            if (op.jobId == jobId) {
+                qDebug() << "Bottom: id=" << op.id << "machineId=" << op.machineId
+                         << "start=" << op.startTime << "dur=" << op.duration;
+            }
+        }
+    }
 }
 

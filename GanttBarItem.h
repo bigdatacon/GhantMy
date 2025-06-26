@@ -27,4 +27,9 @@ private:
     bool m_bisHighlighted = false;
     bool m_isManuallyHighlighted = false;
 
+    QString m_opId;
+    int m_jobId;
+    int m_startTime;
+    int m_duration;
+
 };
