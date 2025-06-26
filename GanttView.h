@@ -16,6 +16,9 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
+    void mousePressEvent(QMouseEvent *event) override;
+
+
 private:
     QGraphicsScene *m_scene;
     QString m_title;

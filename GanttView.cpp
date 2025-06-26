@@ -214,3 +214,20 @@ void GanttView::resizeEvent(QResizeEvent *event) {
         populateScene();  // запускается только при первом реальном размере
     }
 }
+
+void GanttView::mousePressEvent(QMouseEvent *event) {
+    QPointF scenePos = mapToScene(event->pos());
+    QGraphicsItem *clickedItem = scene()->itemAt(scenePos, QTransform());
+
+    // Если кликнули не по GanttBarItem
+    if (!dynamic_cast<GanttBarItem*>(clickedItem)) {
+        for (auto *item : scene()->items()) {
+            if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
+                bar->setHighlighted(false);
+            }
+        }
+    }
+
+    QGraphicsView::mousePressEvent(event); // не забудьте вызвать базовый метод
+}
+
