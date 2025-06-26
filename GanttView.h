@@ -10,7 +10,7 @@ class GanttView : public QGraphicsView {
     Q_OBJECT
 public:
     GanttView(const QString &title, const QVector<OperationData> &operations, GanttDB* db, int maxFinishTime, int uniqueJobCount);
-    void printLinkedOperations(const QString &opId, int jobId);
+    void printLinkedOperations(const QString &opId, int jobId, int m_startTime, int m_duration);
 
 
 protected:

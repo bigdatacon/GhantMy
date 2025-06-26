@@ -58,7 +58,7 @@ void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     auto *ganttView = qobject_cast<GanttView*>(view);
 
     if (ganttView) {
-        ganttView->printLinkedOperations(m_opId, m_jobId);
+        ganttView->printLinkedOperations(m_opId, m_jobId, m_startTime, m_duration);
     }
 
 

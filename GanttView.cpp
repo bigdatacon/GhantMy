@@ -228,15 +228,47 @@ void GanttView::mousePressEvent(QMouseEvent *event) {
 }
 
 
-void GanttView::printLinkedOperations(const QString &opId, int jobId) {
+//void GanttView::printLinkedOperations(const QString &opId, int jobId, int m_startTime, int m_duration) {
+//    if (!m_pDB) return;
+
+//    qDebug() << "=== Связанные операции для jobId =" << jobId << ", opId =" << opId << "===" << " start_time : " << m_startTime << " duration : " <<  m_duration ;
+
+//    for (const auto &pair : m_pDB->topOpIdToGroup) {
+//        for (const auto &op : pair.first + pair.second) {
+//            if (op.id == opId) continue;
+//            if (op.jobId == jobId && (op.startTime+op.duration) == (m_startTime+ m_duration)) {
+//                qDebug() << "Top: id=" << op.id << "machineId=" << op.machineId
+//                         << "start=" << op.startTime << "dur=" << op.duration;
+//            }
+//        }
+//    }
+
+//    for (const auto &list : m_pDB->bottomOpIdToGroup) {
+//        for (const auto &op : list) {
+//            if (op.id == opId) continue;
+//            if (op.jobId == jobId && (op.startTime+op.duration) == (m_startTime+ m_duration)) {
+//                qDebug() << "Bottom: id=" << op.id << "machineId=" << op.machineId
+//                         << "start=" << op.startTime << "dur=" << op.duration;
+//            }
+//        }
+//    }
+//}
+
+
+void GanttView::printLinkedOperations(const QString &opId, int jobId, int m_startTime, int m_duration) {
     if (!m_pDB) return;
 
-    qDebug() << "=== Связанные операции для jobId =" << jobId << ", opId =" << opId << "===";
+    qDebug() << "=== Связанные операции для jobId =" << jobId << ", opId =" << opId << "==="
+             << " start_time : " << m_startTime << " duration : " <<  m_duration;
+
+    QSet<QString> printedIds;
 
     for (const auto &pair : m_pDB->topOpIdToGroup) {
         for (const auto &op : pair.first + pair.second) {
-            if (op.id == opId) continue;
-            if (op.jobId == jobId) {
+            if (printedIds.contains(op.id) || op.id == opId) continue;
+
+            if (op.jobId == jobId && (op.startTime + op.duration == m_startTime + m_duration)) {
+                printedIds.insert(op.id);
                 qDebug() << "Top: id=" << op.id << "machineId=" << op.machineId
                          << "start=" << op.startTime << "dur=" << op.duration;
             }
@@ -245,8 +277,10 @@ void GanttView::printLinkedOperations(const QString &opId, int jobId) {
 
     for (const auto &list : m_pDB->bottomOpIdToGroup) {
         for (const auto &op : list) {
-            if (op.id == opId) continue;
-            if (op.jobId == jobId) {
+            if (printedIds.contains(op.id) || op.id == opId) continue;
+
+            if (op.jobId == jobId && (op.startTime + op.duration == m_startTime + m_duration)) {
+                printedIds.insert(op.id);
                 qDebug() << "Bottom: id=" << op.id << "machineId=" << op.machineId
                          << "start=" << op.startTime << "dur=" << op.duration;
             }
