@@ -23,7 +23,9 @@ void GanttDB::connectDatabase() {
             setupTime INTEGER,
             name TEXT,
             cost INTEGER,
-            predecessors TEXT
+            predecessors TEXT,
+            isHighlighted INTEGER DEFAULT 0
+
         )
     )");
 }
@@ -65,6 +67,7 @@ void GanttDB::loadFromJson(const QString &filename) {
             op.setupTime = obj["setupTime"].toInt();
             op.name = obj["name"].toString();
             op.cost = obj["cost"].toInt();
+            op.isHighlighted = obj.contains("isHighlighted") ? obj["isHighlighted"].toBool() : false;
 
             QJsonArray predArray = obj["predecessors"].toArray();
             for (const auto &p : predArray) {
@@ -73,7 +76,7 @@ void GanttDB::loadFromJson(const QString &filename) {
 
             qDebug() << label << ":" << op.id << op.jobId << op.startTime << op.duration << (op.startTime + op.duration)
                      << " machineId:" << op.machineId << " name:" << op.name << " cost:" << op.cost
-                     << " predecessors:" << op.predecessors;
+                     << " predecessors:" << op.predecessors << " isHighlighted : "<< op.isHighlighted;
 
             result.append(op);
         }
@@ -146,71 +149,6 @@ void GanttDB::loadFromJson(const QString &filename) {
 }
 
 
-//void GanttDB::loadFromJson(const QString &filename) {
-//    QFile file(filename);
-//    if (!file.open(QIODevice::ReadOnly)) {
-//        qWarning() << "Не удалось открыть JSON файл:" << filename;
-//        return;
-//    }
-//    QByteArray data = file.readAll();
-//    file.close();
-
-//    QJsonDocument doc = QJsonDocument::fromJson(data);
-//    QJsonObject root = doc.object();
-//    QJsonArray topArray = root["top"].toArray();
-//    QJsonArray bottomArray = root["bottom"].toArray();
-
-
-//    auto parseArray = [](const QJsonArray &array, const QString &label) {
-//        QVector<OperationData> result;
-//        for (const auto &val : array) {
-//            QJsonObject obj = val.toObject();
-//            OperationData op;
-//            op.id = obj["id"].toString();
-//            op.machineId = obj["machineId"].toInt();
-//            op.jobId = obj["jobId"].toInt();
-//            op.startTime = obj["startTime"].toInt();
-//            op.duration = obj["duration"].toInt();
-//            op.setupTime = obj["setupTime"].toInt();
-//            op.name = obj["name"].toString();
-//            op.cost = obj["cost"].toInt();
-
-//            QJsonArray predArray = obj["predecessors"].toArray();
-//            for (const auto &p : predArray) {
-//                op.predecessors.append(p.toString());
-//            }
-
-////            qDebug() << label << ":" << op.id << op.jobId << op.startTime << op.duration << (op.startTime + op.duration);
-
-//            result.append(op);
-//        }
-//        return result;
-//    };
-
-//    topOperations = parseArray(topArray, "Top");
-//    bottomOperations = parseArray(bottomArray, "Bottom");
-
-//    // Вычисляем maxFinish и uniqueJobCount
-//    maxFinishTop = 0;
-//    maxFinishBottom = 0;
-//    QSet<int> jobsTop, jobsBottom;
-
-//    for (const auto &op : topOperations) {
-//        maxFinishTop = std::max(maxFinishTop, op.startTime + op.duration);
-//        jobsTop.insert(op.jobId);
-//    }
-//    for (const auto &op : bottomOperations) {
-//        maxFinishBottom = std::max(maxFinishBottom, op.startTime + op.duration);
-//        jobsBottom.insert(op.jobId);
-//    }
-
-//    uniqueJobCountTop = jobsTop.size();
-//    uniqueJobCountBottom = jobsBottom.size();
-
-//}
-
-
-
 void GanttDB::writeToDatabase() {
     QSqlQuery query(db);
 
@@ -229,7 +167,9 @@ void GanttDB::writeToDatabase() {
             setupTime INTEGER,
             name TEXT,
             cost INTEGER,
-            predecessors TEXT
+            predecessors TEXT,
+            isHighlighted INTEGER DEFAULT 0
+
         )
     )");
 
@@ -243,7 +183,9 @@ void GanttDB::writeToDatabase() {
             setupTime INTEGER,
             name TEXT,
             cost INTEGER,
-            predecessors TEXT
+            predecessors TEXT,
+            isHighlighted INTEGER DEFAULT 0
+
         )
     )");
 
@@ -251,8 +193,8 @@ void GanttDB::writeToDatabase() {
         for (const auto &op : ops) {
             QString pred = op.predecessors.join(",");
             query.prepare(QString(R"(
-                INSERT INTO %1 (id, machineId, jobId, startTime, duration, setupTime, name, cost, predecessors)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO %1 (id, machineId, jobId, startTime, duration, setupTime, name, cost, predecessors, isHighlighted)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             )").arg(table));
 
             query.addBindValue(op.id);
@@ -264,6 +206,7 @@ void GanttDB::writeToDatabase() {
             query.addBindValue(op.name);
             query.addBindValue(op.cost);
             query.addBindValue(pred);
+            query.addBindValue(op.isHighlighted);
 
             if (!query.exec())
                 qWarning() << "Insert into" << table << "failed:" << query.lastError().text();
@@ -300,6 +243,7 @@ void GanttDB::loadFromDatabase() {
         op.cost = query.value("cost").toInt();
         op.predecessors = query.value("predecessors").toString().split(",", Qt::SkipEmptyParts);
         topOperations.append(op);
+        op.isHighlighted = query.value("isHighlighted").toInt() != 0;
     }
 
     // Загрузка нижнего графика
@@ -316,6 +260,7 @@ void GanttDB::loadFromDatabase() {
         op.cost = query.value("cost").toInt();
         op.predecessors = query.value("predecessors").toString().split(",", Qt::SkipEmptyParts);
         bottomOperations.append(op);
+        op.isHighlighted = query.value("isHighlighted").toInt() != 0;
     }
 
     // Подсчёт максимального времени и уникальных jobId

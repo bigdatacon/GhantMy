@@ -4,18 +4,18 @@
 
 class GanttBarItem : public QGraphicsRectItem {
 public:
+//    GanttBarItem(int machineId, int jobId, int startTime, int duration, int timeUnit, int offsetX, int offsetY);
+//    GanttBarItem(int machineId, int jobId, int startTime, int duration, int timeUnit, int offsetX, int offsetY, int passedBarHeight);
+
+//    GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration, int timeUnit, int offsetX, int offsetY, int passedBarHeight);
+//    GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
+//                               int timeUnit, int offsetX, int offsetY, int barHeight, QColor color);
 
     GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
-                               int timeUnit, int offsetX, int offsetY, int barHeight, QColor color);
+                               int timeUnit, int offsetX, int offsetY, int barHeight, QColor color, bool isHighlighted);
 
 
-    void setHighlighted(bool highlight);
-
-    QString getOpId() const ;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    bool isHighlighted() const ;
-
-
+    void setHighlighted(bool on);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -26,9 +26,5 @@ private:
     QColor m_defaultColor;
     QColor m_assignedColor;  // сохранённый оригинальный цвет
 
-    bool m_highlighted = false;
-
-
-    QString m_opId;
-
+    bool m_bisHighlighted = false;
 };

@@ -14,6 +14,18 @@
 #include <QDebug>
 #include <QSet>
 
+//struct OperationData {
+//    QString id;
+//    int machineId;
+//    int jobId;
+//    int startTime;
+//    int duration;
+//    int setupTime;
+//    QString name;
+//    int cost;
+//    QStringList predecessors;
+//};
+
 struct OperationData {
     QString id;
     int machineId;
@@ -24,7 +36,9 @@ struct OperationData {
     QString name;
     int cost;
     QStringList predecessors;
+    bool isHighlighted = false;  // <- добавляем поле
 };
+
 
 class GanttDB {
 public:
@@ -55,6 +69,9 @@ public:
     void loadFromJson(const QString &filename);
     void writeToDatabase();
     void loadFromDatabase();
+
+    QMap<int, QVector<OperationData>> topBarGroups;
+    QMap<int, QVector<OperationData>> bottomBarGroups;
 
 private:
     GanttDB();
