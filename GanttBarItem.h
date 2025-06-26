@@ -16,6 +16,8 @@ public:
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    void clearAllHighlightsExceptThis();
+
 
 private:
     QPointF m_dragStart;

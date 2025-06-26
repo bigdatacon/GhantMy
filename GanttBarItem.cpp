@@ -1,6 +1,8 @@
 #include "GanttBarItem.h"
 #include <QGraphicsSceneMouseEvent>
 #include <QBrush>
+#include <QGraphicsScene>
+
 
 GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
                            int timeUnit, int offsetX, int offsetY, int passedBarHeight, QColor color,  bool isHighlighted):
@@ -39,13 +41,23 @@ void GanttBarItem::setHighlighted(bool on) {
 //}
 
 
+//void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+//    m_dragStart = event->pos();
+//    m_isManuallyHighlighted = !m_isManuallyHighlighted;
+//    setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
+//    QGraphicsRectItem::mousePressEvent(event);
+//}
+
 void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     m_dragStart = event->pos();
+
+    clearAllHighlightsExceptThis();  // Сбросить всё кроме текущего
+
     m_isManuallyHighlighted = !m_isManuallyHighlighted;
     setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
+
     QGraphicsRectItem::mousePressEvent(event);
 }
-
 
 
 
@@ -91,5 +103,16 @@ void GanttBarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     QGraphicsRectItem::mouseReleaseEvent(event);
 }
 
+
+void GanttBarItem::clearAllHighlightsExceptThis() {
+    if (!scene()) return;
+
+    for (QGraphicsItem *item : scene()->items()) {
+        auto *bar = qgraphicsitem_cast<GanttBarItem *>(item);
+        if (bar && bar != this) {
+            bar->setHighlighted(false);
+        }
+    }
+}
 
 
