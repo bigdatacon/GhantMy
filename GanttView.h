@@ -11,6 +11,7 @@ class GanttView : public QGraphicsView {
 public:
     GanttView(const QString &title, const QVector<OperationData> &operations, GanttDB* db, int maxFinishTime, int uniqueJobCount);
     void printLinkedOperations(const QString &opId, int jobId, int m_startTime, int m_duration);
+     void  clearHighlights();
 
 
 protected:
@@ -34,7 +35,7 @@ private:
 
     void populateScene();  // Добавляет оси, бары, подписи
     void generateJobColorMap();
-    void  clearHighlights();
+
 };
 
 

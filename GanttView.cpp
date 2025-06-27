@@ -182,7 +182,11 @@ void GanttView::populateScene() {
     int sceneHeight = yOffset + spacingY * axisCount;
     int paddingRight = viewWidth / 8;
     m_scene->setSceneRect(0, 0, sceneWidth + paddingRight, sceneHeight + bottomPadding);
+//    m_scene->setProperty("view", QVariant::fromValue(static_cast<void*>(this)));
+
+    m_scene->setProperty("db", QVariant::fromValue(static_cast<void*>(m_pDB)));
     m_scene->setProperty("view", QVariant::fromValue(static_cast<void*>(this)));
+
 
 }
 
@@ -213,22 +217,6 @@ void GanttView::resizeEvent(QResizeEvent *event) {
     }
 }
 
-//void GanttView::mousePressEvent(QMouseEvent *event) {
-//    QPointF scenePos = mapToScene(event->pos());
-//    QGraphicsItem *clickedItem = scene()->itemAt(scenePos, QTransform());
-
-//    // Если кликнули не по GanttBarItem
-//    if (!dynamic_cast<GanttBarItem*>(clickedItem)) {
-//        for (auto *item : scene()->items()) {
-//            if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
-//                bar->setHighlighted(false);
-//            }
-//        }
-//    }
-
-//    QGraphicsView::mousePressEvent(event); // не забудьте вызвать базовый метод
-//}
-
 
 void GanttView::mousePressEvent(QMouseEvent *event) {
     QPointF scenePos = mapToScene(event->pos());
@@ -242,66 +230,6 @@ void GanttView::mousePressEvent(QMouseEvent *event) {
 }
 
 
-
-//void GanttView::printLinkedOperations(const QString &opId, int jobId, int m_startTime, int m_duration) {
-//    if (!m_pDB) return;
-
-//    qDebug() << "=== Связанные операции для jobId =" << jobId << ", opId =" << opId << "===" << " start_time : " << m_startTime << " duration : " <<  m_duration ;
-
-//    for (const auto &pair : m_pDB->topOpIdToGroup) {
-//        for (const auto &op : pair.first + pair.second) {
-//            if (op.id == opId) continue;
-//            if (op.jobId == jobId && (op.startTime+op.duration) == (m_startTime+ m_duration)) {
-//                qDebug() << "Top: id=" << op.id << "machineId=" << op.machineId
-//                         << "start=" << op.startTime << "dur=" << op.duration;
-//            }
-//        }
-//    }
-
-//    for (const auto &list : m_pDB->bottomOpIdToGroup) {
-//        for (const auto &op : list) {
-//            if (op.id == opId) continue;
-//            if (op.jobId == jobId && (op.startTime+op.duration) == (m_startTime+ m_duration)) {
-//                qDebug() << "Bottom: id=" << op.id << "machineId=" << op.machineId
-//                         << "start=" << op.startTime << "dur=" << op.duration;
-//            }
-//        }
-//    }
-//}
-
-
-//void GanttView::printLinkedOperations(const QString &opId, int jobId, int m_startTime, int m_duration) {
-//    if (!m_pDB) return;
-
-//    qDebug() << "=== Связанные операции для jobId =" << jobId << ", opId =" << opId << "==="
-//             << " start_time : " << m_startTime << " duration : " <<  m_duration;
-
-//    QSet<QString> printedIds;
-
-//    for (const auto &pair : m_pDB->topOpIdToGroup) {
-//        for (const auto &op : pair.first + pair.second) {
-//            if (printedIds.contains(op.id) || op.id == opId) continue;
-
-//            if (op.jobId == jobId && (op.startTime + op.duration == m_startTime + m_duration)) {
-//                printedIds.insert(op.id);
-//                qDebug() << "Top: id=" << op.id << "machineId=" << op.machineId
-//                         << "start=" << op.startTime << "dur=" << op.duration;
-//            }
-//        }
-//    }
-
-//    for (const auto &list : m_pDB->bottomOpIdToGroup) {
-//        for (const auto &op : list) {
-//            if (printedIds.contains(op.id) || op.id == opId) continue;
-
-//            if (op.jobId == jobId && (op.startTime + op.duration == m_startTime + m_duration)) {
-//                printedIds.insert(op.id);
-//                qDebug() << "Bottom: id=" << op.id << "machineId=" << op.machineId
-//                         << "start=" << op.startTime << "dur=" << op.duration;
-//            }
-//        }
-//    }
-//}
 
 void GanttView::printLinkedOperations(const QString &opId, int jobId, int m_startTime, int m_duration) {
     if (!m_pDB) return;

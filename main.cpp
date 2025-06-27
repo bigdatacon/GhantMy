@@ -27,6 +27,11 @@ int main(int argc, char *argv[]) {
     GanttView *topChart = new GanttView("Top Chart", GanttDB::instance().topOperations, &GanttDB::instance(), GanttDB::instance().maxFinishTop, GanttDB::instance().uniqueJobCountTop);
     GanttView *bottomChart = new GanttView("Bottom Chart", GanttDB::instance().bottomOperations, &GanttDB::instance(), GanttDB::instance().maxFinishBottom, GanttDB::instance().uniqueJobCountBottom);
 
+//    GanttDB& db = GanttDB::instance();
+    GanttDB::instance().topView = topChart;
+    GanttDB::instance().bottomView = bottomChart;
+
+
     QSplitter *splitter = new QSplitter(Qt::Vertical);
     topChart->setMinimumHeight(400);
     bottomChart->setMinimumHeight(400);

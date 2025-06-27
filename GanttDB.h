@@ -28,6 +28,7 @@ struct OperationData {
     bool isHighlighted = false;  // <- добавляем поле
 };
 
+class GanttView; // В начало файла, до объявления GanttDB
 
 class GanttDB {
 public:
@@ -57,8 +58,10 @@ public:
     void writeToDatabase();
     void loadFromDatabase();
 
-//    QMap<int, QVector<OperationData>> topBarGroups;
-//    QMap<int, QVector<OperationData>> bottomBarGroups;
+
+    // 👇 Новые поля для доступа к GanttView
+    GanttView* topView = nullptr;
+    GanttView* bottomView = nullptr;
 
 private:
     GanttDB();

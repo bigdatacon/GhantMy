@@ -63,24 +63,48 @@ void GanttBarItem::setHighlighted(bool on) {
 
 //}
 
+//void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+//    m_dragStart = event->pos();
+
+//    auto *scenePtr = scene();
+//    if (!scenePtr) return;
+
+//    QVariant viewVar = scenePtr->property("view");
+//    if (viewVar.isValid()) {
+//        auto *view = static_cast<GanttView*>(viewVar.value<void*>());
+//        if (view) {
+//            view->printLinkedOperations(m_opId, m_jobId, m_startTime, m_duration);
+//        }
+//    }
+
+//    QGraphicsRectItem::mousePressEvent(event);
+//}
+
 void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     m_dragStart = event->pos();
 
     auto *scenePtr = scene();
     if (!scenePtr) return;
 
+    QVariant dbVar = scenePtr->property("db");
     QVariant viewVar = scenePtr->property("view");
-    if (viewVar.isValid()) {
-        auto *view = static_cast<GanttView*>(viewVar.value<void*>());
-        if (view) {
-            view->printLinkedOperations(m_opId, m_jobId, m_startTime, m_duration);
-        }
-    }
+    if (!dbVar.isValid() || !viewVar.isValid()) return;
 
+    GanttDB* db = static_cast<GanttDB*>(dbVar.value<void*>());
+    GanttView* currentView = static_cast<GanttView*>(viewVar.value<void*>());
+
+    if (!db || !currentView) return;
+
+    // Очистить оба графика
+    if (db->topView) db->topView->clearHighlights();
+    if (db->bottomView) db->bottomView->clearHighlights();
+
+    // Подсветить в обоих графиках
+    if (db->topView) db->topView->printLinkedOperations(m_opId, m_jobId, m_startTime, m_duration);
+    if (db->bottomView) db->bottomView->printLinkedOperations(m_opId, m_jobId, m_startTime, m_duration);
     QGraphicsRectItem::mousePressEvent(event);
+
 }
-
-
 
 
 
