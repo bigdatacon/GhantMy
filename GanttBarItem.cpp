@@ -40,31 +40,45 @@ void GanttBarItem::setHighlighted(bool on) {
 
 
 
+//void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+//    m_dragStart = event->pos();
+
+//    clearAllHighlightsExceptThis();  // Сбросить всё кроме текущего
+
+//    m_isManuallyHighlighted = !m_isManuallyHighlighted;
+//    setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
+
+//    QGraphicsRectItem::mousePressEvent(event);
+
+
+//    auto *scenePtr = scene();
+//    if (!scenePtr) return;
+
+//    QObject *view = scenePtr->parent();
+//    auto *ganttView = qobject_cast<GanttView*>(view);
+
+//    if (ganttView) {
+//        ganttView->printLinkedOperations(m_opId, m_jobId, m_startTime, m_duration);
+//    }
+
+//}
+
 void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     m_dragStart = event->pos();
-
-    clearAllHighlightsExceptThis();  // Сбросить всё кроме текущего
-
-    m_isManuallyHighlighted = !m_isManuallyHighlighted;
-    setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
-
-    QGraphicsRectItem::mousePressEvent(event);
-
 
     auto *scenePtr = scene();
     if (!scenePtr) return;
 
-    QObject *view = scenePtr->parent();
-    auto *ganttView = qobject_cast<GanttView*>(view);
-
-    if (ganttView) {
-        ganttView->printLinkedOperations(m_opId, m_jobId, m_startTime, m_duration);
+    QVariant viewVar = scenePtr->property("view");
+    if (viewVar.isValid()) {
+        auto *view = static_cast<GanttView*>(viewVar.value<void*>());
+        if (view) {
+            view->printLinkedOperations(m_opId, m_jobId, m_startTime, m_duration);
+        }
     }
 
-
-
+    QGraphicsRectItem::mousePressEvent(event);
 }
-
 
 
 
@@ -100,6 +114,11 @@ void GanttBarItem::clearAllHighlightsExceptThis() {
             bar->setHighlighted(false);
         }
     }
+}
+
+
+QString GanttBarItem::getOpId() const {
+    return m_opId;
 }
 
 

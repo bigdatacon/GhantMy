@@ -34,6 +34,7 @@ private:
 
     void populateScene();  // Добавляет оси, бары, подписи
     void generateJobColorMap();
+    void  clearHighlights();
 };
 
 

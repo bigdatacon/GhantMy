@@ -9,6 +9,7 @@ public:
 
 
     void setHighlighted(bool on);
+    QString getOpId() const;
 
 
 
@@ -17,6 +18,7 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     void clearAllHighlightsExceptThis();
+
 
 
 private:
