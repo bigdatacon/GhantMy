@@ -4,6 +4,8 @@
 #include <QGraphicsScene>
 #include "GanttDB.h"
 #include "GanttView.h"
+#include <cmath> // убедитесь, что подключили этот заголовок
+
 
 GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
                            int timeUnit, int offsetX, int offsetY, int passedBarHeight, QColor color,  bool isHighlighted):
@@ -145,4 +147,20 @@ QString GanttBarItem::getOpId() const {
     return m_opId;
 }
 
+
+void GanttBarItem::drawArrow(QGraphicsScene *scene, QPointF from, QPointF to) {
+    QPen pen(Qt::red, 2);
+    scene->addLine(QLineF(from, to), pen)->setData(0, "arrow");
+
+    double angle = std::atan2(to.y() - from.y(), to.x() - from.x());
+    double arrowSize = 8;
+
+    QPointF arrowP1 = to - QPointF(arrowSize * std::cos(angle - M_PI / 6), arrowSize * std::sin(angle - M_PI / 6));
+    QPointF arrowP2 = to - QPointF(arrowSize * std::cos(angle + M_PI / 6), arrowSize * std::sin(angle + M_PI / 6));
+
+    QPolygonF arrowHead;
+    arrowHead << to << arrowP1 << arrowP2;
+    auto *arrow = scene->addPolygon(arrowHead, pen, QBrush(Qt::red));
+    arrow->setData(0, "arrow");
+}
 

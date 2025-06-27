@@ -10,6 +10,7 @@ public:
 
     void setHighlighted(bool on);
     QString getOpId() const;
+    static void drawArrow(QGraphicsScene *scene, QPointF from, QPointF to) ;
 
 
 

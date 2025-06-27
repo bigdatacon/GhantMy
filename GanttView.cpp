@@ -231,28 +231,229 @@ void GanttView::mousePressEvent(QMouseEvent *event) {
 
 
 
+//void GanttView::printLinkedOperations(const QString &opId, int jobId, int m_startTime, int m_duration) {
+//    if (!m_pDB) return;
+
+//    clearHighlights();  // Снять все подсветки
+
+//    QSet<QString> printedIds;
+
+//    qDebug() << "=== Связанные операции для jobId =" << jobId << ", opId =" << opId << "==="
+//             << " start_time : " << m_startTime << " duration : " <<  m_duration;
+
+//    for (const auto &pair : m_pDB->topOpIdToGroup) {
+//        for (const auto &op : pair.first + pair.second) {
+//            if (printedIds.contains(op.id) || op.id == opId) continue;
+
+//            if (op.jobId == jobId && (op.startTime + op.duration == m_startTime + m_duration)) {
+//                printedIds.insert(op.id);
+//                qDebug() << "Top: id=" << op.id;
+//                // Найти и подсветить этот бар на сцене
+//                for (QGraphicsItem *item : m_scene->items()) {
+//                    if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
+//                        if (bar->getOpId() == op.id)
+//                            bar->setHighlighted(true);
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+//    for (const auto &list : m_pDB->bottomOpIdToGroup) {
+//        for (const auto &op : list) {
+//            if (printedIds.contains(op.id) || op.id == opId) continue;
+
+//            if (op.jobId == jobId && (op.startTime + op.duration == m_startTime + m_duration)) {
+//                printedIds.insert(op.id);
+//                qDebug() << "Bottom: id=" << op.id;
+//                for (QGraphicsItem *item : m_scene->items()) {
+//                    if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
+//                        if (bar->getOpId() == op.id)
+//                            bar->setHighlighted(true);
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+//    // Подсветить и сам текущий бар
+//    for (QGraphicsItem *item : m_scene->items()) {
+//        if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
+//            if (bar->getOpId() == opId)
+//                bar->setHighlighted(true);
+//        }
+//    }
+//}
+
+
+//void GanttView::printLinkedOperations(const QString &opId, int jobId, int m_startTime, int m_duration) {
+//    if (!m_pDB) return;
+
+//    clearHighlights();  // Снять все подсветки
+
+//    QSet<QString> printedIds;
+
+//    // Удалить старые стрелки (предполагаем, что они имеют data(0) == "arrow")
+//    for (QGraphicsItem *item : m_scene->items()) {
+//        if (item->data(0).toString() == "arrow") {
+//            m_scene->removeItem(item);
+//            delete item;
+//        }
+//    }
+
+//    // Подсветить сам текущий бар
+//    GanttBarItem* currentBar = nullptr;
+//    for (QGraphicsItem *item : m_scene->items()) {
+//        if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
+//            if (bar->getOpId() == opId) {
+//                bar->setHighlighted(true);
+//                currentBar = bar;
+//            }
+//        }
+//    }
+
+//    if (m_title.contains("Top")) {
+//        // Найти текущую операцию в базе
+//        OperationData currentOp;
+//        bool found = false;
+//        for (const auto &op : m_pDB->topOperations) {
+//            if (op.id == opId) {
+//                currentOp = op;
+//                found = true;
+//                break;
+//            }
+//        }
+
+//        if (found) {
+//            QPointF prevCenter;
+//            for (const QString &predId : currentOp.predecessors) {
+//                for (QGraphicsItem *item : m_scene->items()) {
+//                    if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
+//                        if (bar->getOpId() == predId) {
+//                            bar->setHighlighted(true);
+//                            QPointF start = bar->sceneBoundingRect().center();
+//                            QPointF end = currentBar ? currentBar->sceneBoundingRect().center() : QPointF();
+//                            if (!prevCenter.isNull()) {
+//                                // рисуем стрелку от предыдущего предшественника к текущему
+//                                QGraphicsLineItem *line = m_scene->addLine(QLineF(prevCenter, start), QPen(Qt::red, 2));
+//                                line->setData(0, "arrow");
+//                            }
+//                            if (!end.isNull()) {
+//                                QGraphicsLineItem *line = m_scene->addLine(QLineF(start, end), QPen(Qt::red, 2));
+//                                line->setData(0, "arrow");
+//                            }
+//                            prevCenter = start;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+//    // Подсветить связанные операции по времени (topOpIdToGroup и bottomOpIdToGroup)
+//    for (const auto &pair : m_pDB->topOpIdToGroup) {
+//        for (const auto &op : pair.first + pair.second) {
+//            if (printedIds.contains(op.id) || op.id == opId) continue;
+
+//            if (op.jobId == jobId && (op.startTime + op.duration == m_startTime + m_duration)) {
+//                printedIds.insert(op.id);
+//                for (QGraphicsItem *item : m_scene->items()) {
+//                    if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
+//                        if (bar->getOpId() == op.id)
+//                            bar->setHighlighted(true);
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+//    for (const auto &list : m_pDB->bottomOpIdToGroup) {
+//        for (const auto &op : list) {
+//            if (printedIds.contains(op.id) || op.id == opId) continue;
+
+//            if (op.jobId == jobId && (op.startTime + op.duration == m_startTime + m_duration)) {
+//                printedIds.insert(op.id);
+//                for (QGraphicsItem *item : m_scene->items()) {
+//                    if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
+//                        if (bar->getOpId() == op.id)
+//                            bar->setHighlighted(true);
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
+
 void GanttView::printLinkedOperations(const QString &opId, int jobId, int m_startTime, int m_duration) {
     if (!m_pDB) return;
 
-    clearHighlights();  // Снять все подсветки
+    clearHighlights();
 
+    // Удалить старые стрелки
+    for (QGraphicsItem *item : m_scene->items()) {
+        if (item->data(0).toString() == "arrow") {
+            m_scene->removeItem(item);
+            delete item;
+        }
+    }
+
+    // Найти текущий бар
+    GanttBarItem* currentBar = nullptr;
+    for (QGraphicsItem *item : m_scene->items()) {
+        if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
+            if (bar->getOpId() == opId) {
+                bar->setHighlighted(true);
+                currentBar = bar;
+            }
+        }
+    }
+
+    // Обработка предшественников (только для Top Chart)
+    if (m_title.contains("Top") && currentBar) {
+        OperationData currentOp;
+        bool found = false;
+        for (const auto &op : m_pDB->topOperations) {
+            if (op.id == opId) {
+                currentOp = op;
+                found = true;
+                break;
+            }
+        }
+
+        if (found && !currentOp.predecessors.isEmpty()) {
+            QList<GanttBarItem*> predBars;
+            for (const QString &predId : currentOp.predecessors) {
+                for (QGraphicsItem *item : m_scene->items()) {
+                    if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
+                        if (bar->getOpId() == predId) {
+                            bar->setHighlighted(true);
+                            predBars << bar;
+                        }
+                    }
+                }
+            }
+
+            // Рисуем стрелки от предшественников к следующему (или к текущему, если он один)
+            for (int i = 0; i < predBars.size(); ++i) {
+                if (i + 1 < predBars.size()) {
+                    GanttBarItem::drawArrow(m_scene, predBars[i]->sceneBoundingRect().center(), predBars[i + 1]->sceneBoundingRect().center());
+                } else {
+                    GanttBarItem::drawArrow(m_scene, predBars[i]->sceneBoundingRect().center(), currentBar->sceneBoundingRect().center());
+                }
+            }
+        }
+    }
+
+    // Подсветка связанных операций по времени
     QSet<QString> printedIds;
-
-    qDebug() << "=== Связанные операции для jobId =" << jobId << ", opId =" << opId << "==="
-             << " start_time : " << m_startTime << " duration : " <<  m_duration;
-
     for (const auto &pair : m_pDB->topOpIdToGroup) {
         for (const auto &op : pair.first + pair.second) {
             if (printedIds.contains(op.id) || op.id == opId) continue;
-
             if (op.jobId == jobId && (op.startTime + op.duration == m_startTime + m_duration)) {
                 printedIds.insert(op.id);
-                qDebug() << "Top: id=" << op.id;
-                // Найти и подсветить этот бар на сцене
                 for (QGraphicsItem *item : m_scene->items()) {
                     if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
-                        if (bar->getOpId() == op.id)
-                            bar->setHighlighted(true);
+                        if (bar->getOpId() == op.id) bar->setHighlighted(true);
                     }
                 }
             }
@@ -262,29 +463,17 @@ void GanttView::printLinkedOperations(const QString &opId, int jobId, int m_star
     for (const auto &list : m_pDB->bottomOpIdToGroup) {
         for (const auto &op : list) {
             if (printedIds.contains(op.id) || op.id == opId) continue;
-
             if (op.jobId == jobId && (op.startTime + op.duration == m_startTime + m_duration)) {
                 printedIds.insert(op.id);
-                qDebug() << "Bottom: id=" << op.id;
                 for (QGraphicsItem *item : m_scene->items()) {
                     if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
-                        if (bar->getOpId() == op.id)
-                            bar->setHighlighted(true);
+                        if (bar->getOpId() == op.id) bar->setHighlighted(true);
                     }
                 }
             }
         }
     }
-
-    // Подсветить и сам текущий бар
-    for (QGraphicsItem *item : m_scene->items()) {
-        if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
-            if (bar->getOpId() == opId)
-                bar->setHighlighted(true);
-        }
-    }
 }
-
 
 
 void GanttView::clearHighlights() {
