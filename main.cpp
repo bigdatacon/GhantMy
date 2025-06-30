@@ -24,8 +24,8 @@ int main(int argc, char *argv[]) {
     mainWidget.resize(1000, 800);
 
     QVBoxLayout *layout = new QVBoxLayout(&mainWidget);
-    GanttView *topChart = new GanttView("Top Chart", GanttDB::instance().topOperations, &GanttDB::instance(), GanttDB::instance().maxFinishTop, GanttDB::instance().uniqueJobCountTop);
-    GanttView *bottomChart = new GanttView("Bottom Chart", GanttDB::instance().bottomOperations, &GanttDB::instance(), GanttDB::instance().maxFinishBottom, GanttDB::instance().uniqueJobCountBottom);
+    GanttView *topChart = new GanttView("График Машин", GanttDB::instance().topOperations, &GanttDB::instance(), GanttDB::instance().maxFinishTop, GanttDB::instance().uniqueJobCountTop);
+    GanttView *bottomChart = new GanttView("График Работ", GanttDB::instance().bottomOperations, &GanttDB::instance(), GanttDB::instance().maxFinishBottom, GanttDB::instance().uniqueJobCountBottom);
 
 //    GanttDB& db = GanttDB::instance();
     GanttDB::instance().topView = topChart;

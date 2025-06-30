@@ -204,7 +204,7 @@ void GanttView::populateScene() {
 
     QSet<int> axisIds;
     for (const auto& op : m_operations) {
-        axisIds.insert(m_title.contains("Top") ? op.machineId : op.jobId);
+        axisIds.insert(m_title.contains("Машин") ? op.machineId : op.jobId);
     }
     QList<int> sortedAxisIds = axisIds.values();
     std::sort(sortedAxisIds.begin(), sortedAxisIds.end());
@@ -214,6 +214,11 @@ void GanttView::populateScene() {
     int titleHeight = viewHeight / 10;
     int topPadding = viewHeight / 10;
     int bottomPadding = viewHeight / 10;
+
+    qreal relativeOffsetX = viewWidth * (-0.04);  // 5% от ширины видимой области
+
+
+
 
     int availableHeight = viewHeight - titleHeight - topPadding - bottomPadding;
     int spacingY = availableHeight / axisCount;
@@ -247,11 +252,12 @@ void GanttView::populateScene() {
     timeLabel->setFont(timeFont);
     QFontMetricsF fmTime(timeFont);
     qreal timeWidth = fmTime.boundingRect("Время, мин").width();
-    timeLabel->setPos(viewWidth / 2 - timeWidth / 2, yOffset - std::max(barHeight, baseFontSize) * 2.5);
+//    timeLabel->setPos(viewWidth / 2 - timeWidth / 2, yOffset - std::max(barHeight, baseFontSize) * 2.5);
+    timeLabel->setPos(viewWidth / 2 - timeWidth / 2, yOffset - std::max(barHeight, baseFontSize) * 3.3);
     m_scene->addItem(timeLabel);
 
     // Вертикальная подпись
-    QString yAxisLabel = m_title.contains("Top") ? "Машины" : "Работы";
+    QString yAxisLabel = m_title.contains("Машин") ? "Машины" : "Работы";
     QGraphicsTextItem *axisLabel = new QGraphicsTextItem(yAxisLabel);
     QFont axisFont;
     axisFont.setPointSize(baseFontSize * 0.7);
@@ -259,7 +265,7 @@ void GanttView::populateScene() {
     axisLabel->setFont(axisFont);
     axisLabel->setRotation(-90);
 //    axisLabel->setPos(5, viewHeight / 2 + axisLabel->boundingRect().width() / 2);
-    axisLabel->setPos(viewWidth/2, viewHeight / 2 + axisLabel->boundingRect().width() / 2);
+    axisLabel->setPos(relativeOffsetX, viewHeight / 2 + axisLabel->boundingRect().width() / 2);
     m_scene->addItem(axisLabel);
 
     for (int t = 0; t <= maxFinishTime; ++t) {
@@ -268,7 +274,8 @@ void GanttView::populateScene() {
 
         auto *label = new QGraphicsTextItem(QString::number(t));
         QFont labelFont;
-        labelFont.setPointSize(baseFontSize * 0.8);
+//        labelFont.setPointSize(baseFontSize * 0.8);
+        labelFont.setPointSize(baseFontSize * 0.7);
         label->setFont(labelFont);
         QFontMetricsF labelMetrics(labelFont);
         qreal labelWidth = labelMetrics.boundingRect(QString::number(t)).width();
@@ -282,7 +289,7 @@ void GanttView::populateScene() {
         int y = yOffset + spacingY * i;
         m_scene->addLine(spacingX, y, spacingX + timeUnit * maxFinishTime, y, QPen(Qt::gray));
 
-        auto *axisText = new QGraphicsTextItem(QString("%1%2").arg(m_title.contains("Top") ? "М" : "J").arg(id));
+        auto *axisText = new QGraphicsTextItem(QString("%1%2").arg(m_title.contains("Машин") ? "М" : "J").arg(id));
         QFont labelFont;
         labelFont.setPointSize(baseFontSize * 0.8);
         axisText->setFont(labelFont);
@@ -290,7 +297,7 @@ void GanttView::populateScene() {
         m_scene->addItem(axisText);
 
         for (const auto& op : m_operations) {
-            int groupId = m_title.contains("Top") ? op.machineId : op.jobId;
+            int groupId = m_title.contains("Машин") ? op.machineId : op.jobId;
             if (groupId != id) continue;
 
             int barY = y - barHeight / 2;
@@ -313,7 +320,7 @@ void GanttView::populateScene() {
             bar->setToolTip(QString("%1\nSetup: %2\nCost: %3").arg(op.name).arg(op.setupTime).arg(op.cost));
             m_scene->addItem(bar);
 
-            if (m_title.contains("Top")) {
+            if (m_title.contains("Машин")) {
                 QGraphicsTextItem* jobLabel = new QGraphicsTextItem(QString("J%1").arg(op.jobId));
                 QFont labelFont;
                 labelFont.setPointSize(baseFontSize * 0.6);
@@ -426,7 +433,7 @@ void GanttView::printLinkedOperations(const QString &opId, int jobId, int m_star
     }
 
     // Обработка предшественников (только для Top Chart)
-    if (m_title.contains("Top") && currentBar) {
+    if (m_title.contains("Машин") && currentBar) {
         OperationData currentOp;
         bool found = false;
         for (const auto &op : m_pDB->topOperations) {
