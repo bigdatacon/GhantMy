@@ -37,159 +37,6 @@ void GanttView::generateJobColorMap() {
     }
 }
 
-//void GanttView::populateScene() {
-//    m_scene->clear();
-
-//    QMultiMap<int, int> jobToMachines;
-//    for (const auto& op : m_pDB->topOperations + m_pDB->bottomOperations) {
-//        jobToMachines.insert(op.jobId, op.machineId);
-//    }
-
-
-
-//    int viewWidth = viewport()->width();
-//    int viewHeight = viewport()->height();
-
-//    QSet<int> axisIds;
-//    for (const auto& op : m_operations) {
-//        axisIds.insert(m_title.contains("Top") ? op.machineId : op.jobId);
-//    }
-//    QList<int> sortedAxisIds = axisIds.values();
-//    std::sort(sortedAxisIds.begin(), sortedAxisIds.end());
-//    int axisCount = sortedAxisIds.size();
-
-//    int spacingX = viewWidth / 20;
-//    int titleHeight = viewHeight / 12;
-//    int topPadding = viewHeight / 10;
-//    int bottomPadding = viewHeight / 10;
-
-//    int availableHeight = viewHeight - titleHeight - topPadding - bottomPadding;
-//    int spacingY = availableHeight / axisCount;
-//    int barHeight = spacingY * 0.2;
-
-//    int maxFinishTime = 0;
-//    for (const auto& op : m_pDB->topOperations + m_pDB->bottomOperations)
-//        maxFinishTime = std::max(maxFinishTime, op.startTime + op.duration);
-
-//    int timeUnit = (viewWidth - spacingX * 2) / std::max(1, maxFinishTime);
-//    int baseFontSize = std::min(viewWidth, viewHeight) / 30;
-//    int yOffset = titleHeight + topPadding + baseFontSize;
-
-//    QGraphicsTextItem *titleItem = new QGraphicsTextItem(m_title);
-//    QFont titleFont;
-//    titleFont.setBold(true);
-//    titleFont.setPointSize(baseFontSize);
-//    titleItem->setFont(titleFont);
-
-//    QFontMetricsF fm(titleFont);
-//    qreal titleWidth = fm.boundingRect(m_title).width();
-//    titleItem->setPos(viewWidth / 2 - titleWidth / 2, 0);
-//    m_scene->addItem(titleItem);
-
-//    for (int t = 0; t <= maxFinishTime; ++t) {
-//        int x = spacingX + t * timeUnit;
-//        m_scene->addLine(x, yOffset, x, yOffset + spacingY * axisCount, QPen(Qt::lightGray));
-
-//        auto *label = new QGraphicsTextItem(QString::number(t));
-//        QFont labelFont;
-//        labelFont.setPointSize(baseFontSize * 0.8);
-//        label->setFont(labelFont);
-//        QFontMetricsF labelMetrics(labelFont);
-//        qreal labelWidth = labelMetrics.boundingRect(QString::number(t)).width();
-//        int labelY = yOffset - std::max(barHeight, baseFontSize) * 2;
-//        label->setPos(x - labelWidth / 2, labelY);
-//        m_scene->addItem(label);
-//    }
-
-//    for (int i = 0; i < sortedAxisIds.size(); ++i) {
-//        int id = sortedAxisIds[i];
-//        int y = yOffset + spacingY * i;
-//        m_scene->addLine(spacingX, y, spacingX + timeUnit * maxFinishTime, y, QPen(Qt::gray));
-
-//        auto *axisLabel = new QGraphicsTextItem(QString("%1%2").arg(m_title.contains("Top") ? "М" : "J").arg(id));
-
-
-
-//        QFont labelFont;
-//        labelFont.setPointSize(baseFontSize * 0.8);
-//        axisLabel->setFont(labelFont);
-//        axisLabel->setPos(5, y - barHeight / 2);
-//        m_scene->addItem(axisLabel);
-
-//        for (const auto& op : m_operations) {
-//            int groupId = m_title.contains("Top") ? op.machineId : op.jobId;
-//            if (groupId != id) continue;
-
-//            int barY = y - barHeight / 2;
-//            QColor color = m_jobColorMap.value(op.jobId, Qt::blue);
-
-//            auto *bar = new GanttBarItem(
-//                op.id,
-//                op.machineId,
-//                op.jobId,
-//                op.startTime,
-//                op.duration,
-//                timeUnit,
-//                spacingX,
-//                barY,
-//                barHeight,
-//                color,
-//                op.isHighlighted,
-//                op.setupTime
-
-//            );
-//            bar->setToolTip(QString("%1\nSetup: %2\nCost: %3").arg(op.name).arg(op.setupTime).arg(op.cost));
-//            m_scene->addItem(bar);
-
-//            if (m_title.contains("Top")) {
-//                // На верхнем графике показываем jobId (как было)
-//                QGraphicsTextItem* jobLabel = new QGraphicsTextItem(QString("J%1").arg(op.jobId));
-//                QFont labelFont;
-//                labelFont.setPointSize(baseFontSize * 0.6);
-//                jobLabel->setFont(labelFont);
-//                int barX = spacingX + op.startTime * timeUnit;
-//                jobLabel->setPos(barX + 2, barY);  // немного вправо от начала бара
-//                m_scene->addItem(jobLabel);
-//            }
-//        else {
-//            QVector<OperationData> relatedTopOps = m_pDB->bottomOpIdToGroup.value(op.id);
-
-//            QSet<int> machineSet;
-//            for (const auto& relatedOp : relatedTopOps)
-//                machineSet.insert(relatedOp.machineId);
-
-//            // Преобразуем в список и сортируем
-//            QList<int> sortedMachines = QList<int>::fromSet(machineSet);
-//            std::sort(sortedMachines.begin(), sortedMachines.end());
-
-//            QStringList machineLabels;
-//            for (int mid : sortedMachines)
-//                machineLabels << QString("M%1").arg(mid);
-
-//            QGraphicsTextItem* machineLabel = new QGraphicsTextItem(machineLabels.join(","));
-//            QFont labelFont;
-//            labelFont.setPointSize(baseFontSize * 0.6);
-//            machineLabel->setFont(labelFont);
-//            int barX = spacingX + op.startTime * timeUnit;
-//            machineLabel->setPos(barX + 2, barY);
-//            m_scene->addItem(machineLabel);
-//        }
-
-
-//        }
-//    }
-
-//    int sceneWidth = spacingX + timeUnit * (maxFinishTime + 1);
-//    int sceneHeight = yOffset + spacingY * axisCount;
-//    int paddingRight = viewWidth / 8;
-//    m_scene->setSceneRect(0, 0, sceneWidth + paddingRight, sceneHeight + bottomPadding);
-////    m_scene->setProperty("view", QVariant::fromValue(static_cast<void*>(this)));
-
-//    m_scene->setProperty("db", QVariant::fromValue(static_cast<void*>(m_pDB)));
-//    m_scene->setProperty("view", QVariant::fromValue(static_cast<void*>(this)));
-
-
-//}
 
 void GanttView::populateScene() {
     m_scene->clear();
@@ -303,31 +150,10 @@ void GanttView::populateScene() {
             int barY = y - barHeight / 2;
             QColor color = m_jobColorMap.value(op.jobId, Qt::blue);
 
-            auto *bar = new GanttBarItem(
-                op.id,
-                op.machineId,
-                op.jobId,
-                op.startTime,
-                op.duration,
-                timeUnit,
-                spacingX,
-                barY,
-                barHeight,
-                color,
-                op.isHighlighted,
-                op.setupTime
-            );
-            bar->setToolTip(QString("%1\nSetup: %2\nCost: %3").arg(op.name).arg(op.setupTime).arg(op.cost));
-            m_scene->addItem(bar);
+            QString labelText;
 
             if (m_title.contains("Машин")) {
-                QGraphicsTextItem* jobLabel = new QGraphicsTextItem(QString("J%1").arg(op.jobId));
-                QFont labelFont;
-                labelFont.setPointSize(baseFontSize * 0.6);
-                jobLabel->setFont(labelFont);
-                int barX = spacingX + op.startTime * timeUnit;
-                jobLabel->setPos(barX + 2, barY);
-                m_scene->addItem(jobLabel);
+                labelText = QString("J%1").arg(op.jobId);
             }
             else {
                 QVector<OperationData> relatedTopOps = m_pDB->bottomOpIdToGroup.value(op.id);
@@ -342,15 +168,30 @@ void GanttView::populateScene() {
                 for (int mid : sortedMachines)
                     machineLabels << QString("M%1").arg(mid);
 
-                QGraphicsTextItem* machineLabel = new QGraphicsTextItem(machineLabels.join(","));
-                QFont labelFont;
-                labelFont.setPointSize(baseFontSize * 0.6);
-                machineLabel->setFont(labelFont);
-                int barX = spacingX + op.startTime * timeUnit;
-                machineLabel->setPos(barX + 2, barY);
-                m_scene->addItem(machineLabel);
+                labelText = machineLabels.join(",");
+
             }
+
+            auto *bar = new GanttBarItem(
+                op.id,
+                op.machineId,
+                op.jobId,
+                op.startTime,
+                op.duration,
+                timeUnit,
+                spacingX,
+                barY,
+                barHeight,
+                color,
+                op.isHighlighted,
+                op.setupTime,
+                op.cost,
+                labelText
+            );
+            bar->setToolTip(QString("%1\nSetup: %2\nCost: %3").arg(op.name).arg(op.setupTime).arg(op.cost));
+            m_scene->addItem(bar);
         }
+
     }
 
     // Нижняя замыкающая линия

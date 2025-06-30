@@ -5,7 +5,8 @@
 class GanttBarItem : public QGraphicsRectItem {
 public:
     GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
-                               int timeUnit, int offsetX, int offsetY, int barHeight, QColor color, bool isHighlighted, int setupTime);
+                               int timeUnit, int offsetX, int offsetY, int barHeight, QColor color, bool isHighlighted, int setupTime
+                 ,int cost, const QString &innerLabelTex );
 
 
     void setHighlighted(bool on);
@@ -39,5 +40,14 @@ private:
     int m_itimeUnit = 1;
 
     int m_duration;
+
+    int m_imachineId;
+    int m_setupTime;
+    QString m_sname;
+    int m_icost;
+
+    QString m_innerLabel = nullptr;
+
+
 
 };
