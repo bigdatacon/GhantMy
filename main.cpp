@@ -47,6 +47,59 @@
 //    return app.exec();
 //}
 
+//#include <QApplication>
+//#include <QSplitter>
+//#include <QVBoxLayout>
+//#include <QWidget>
+//#include <QPushButton>
+//#include <QHBoxLayout>
+//#include "GanttView.h"
+//#include "GanttDB.h"
+
+//int main(int argc, char *argv[]) {
+//    QApplication app(argc, argv);
+
+//    GanttDB::instance().loadFromJson("operations.json");
+//    GanttDB::instance().writeToDatabase();
+//    GanttDB::instance().loadFromDatabase();
+
+//    QWidget mainWidget;
+//    mainWidget.setWindowTitle("Диаграмма Ганта — два графика + меню");
+//    mainWidget.resize(1000, 800);
+
+//    // Верхняя панель с кнопками
+//    QWidget *menuWidget = new QWidget();
+//    QHBoxLayout *menuLayout = new QHBoxLayout(menuWidget);
+//    QPushButton *showCostButton = new QPushButton("ShowCost");
+//    menuLayout->addWidget(showCostButton);
+//    menuLayout->addStretch(); // Чтобы кнопка ушла влево
+
+//    // Графики
+//    GanttView *topChart = new GanttView("График Машин", GanttDB::instance().topOperations, &GanttDB::instance(), GanttDB::instance().maxFinishTop, GanttDB::instance().uniqueJobCountTop);
+//    GanttView *bottomChart = new GanttView("График Работ", GanttDB::instance().bottomOperations, &GanttDB::instance(), GanttDB::instance().maxFinishBottom, GanttDB::instance().uniqueJobCountBottom);
+
+//    GanttDB::instance().topView = topChart;
+//    GanttDB::instance().bottomView = bottomChart;
+
+//    // Сплиттер для графиков
+//    QSplitter *splitter = new QSplitter(Qt::Vertical);
+//    topChart->setMinimumHeight(400);
+//    bottomChart->setMinimumHeight(400);
+//    splitter->addWidget(topChart);
+//    splitter->addWidget(bottomChart);
+//    splitter->setStretchFactor(0, 1);
+//    splitter->setStretchFactor(1, 1);
+
+//    // Основный лэйаут
+//    QVBoxLayout *layout = new QVBoxLayout(&mainWidget);
+//    layout->addWidget(menuWidget);    // Добавляем меню сверху
+//    layout->addWidget(splitter);      // Графики снизу
+
+//    mainWidget.show();
+//    return app.exec();
+//}
+
+
 #include <QApplication>
 #include <QSplitter>
 #include <QVBoxLayout>
@@ -71,8 +124,10 @@ int main(int argc, char *argv[]) {
     QWidget *menuWidget = new QWidget();
     QHBoxLayout *menuLayout = new QHBoxLayout(menuWidget);
     QPushButton *showCostButton = new QPushButton("ShowCost");
+    QPushButton *offCostButton = new QPushButton("OffCost");
     menuLayout->addWidget(showCostButton);
-    menuLayout->addStretch(); // Чтобы кнопка ушла влево
+    menuLayout->addWidget(offCostButton);
+    menuLayout->addStretch();
 
     // Графики
     GanttView *topChart = new GanttView("График Машин", GanttDB::instance().topOperations, &GanttDB::instance(), GanttDB::instance().maxFinishTop, GanttDB::instance().uniqueJobCountTop);
@@ -81,7 +136,6 @@ int main(int argc, char *argv[]) {
     GanttDB::instance().topView = topChart;
     GanttDB::instance().bottomView = bottomChart;
 
-    // Сплиттер для графиков
     QSplitter *splitter = new QSplitter(Qt::Vertical);
     topChart->setMinimumHeight(400);
     bottomChart->setMinimumHeight(400);
@@ -90,10 +144,20 @@ int main(int argc, char *argv[]) {
     splitter->setStretchFactor(0, 1);
     splitter->setStretchFactor(1, 1);
 
-    // Основный лэйаут
     QVBoxLayout *layout = new QVBoxLayout(&mainWidget);
-    layout->addWidget(menuWidget);    // Добавляем меню сверху
-    layout->addWidget(splitter);      // Графики снизу
+    layout->addWidget(menuWidget);
+    layout->addWidget(splitter);
+
+    // Обработка кнопок
+    QObject::connect(showCostButton, &QPushButton::clicked, [&]() {
+        if (GanttDB::instance().topView) GanttDB::instance().topView->startCostPulse();
+        if (GanttDB::instance().bottomView) GanttDB::instance().bottomView->startCostPulse();
+    });
+
+    QObject::connect(offCostButton, &QPushButton::clicked, [&]() {
+        if (GanttDB::instance().topView) GanttDB::instance().topView->stopCostPulse();
+        if (GanttDB::instance().bottomView) GanttDB::instance().bottomView->stopCostPulse();
+    });
 
     mainWidget.show();
     return app.exec();

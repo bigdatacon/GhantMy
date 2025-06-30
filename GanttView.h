@@ -14,6 +14,10 @@ public:
      void  clearHighlights();
 
 
+     void startCostPulse();
+     void stopCostPulse();
+
+
 protected:
     void wheelEvent(QWheelEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;

@@ -6,6 +6,10 @@
 #include "GanttView.h"
 #include <cmath> // убедитесь, что подключили этот заголовок
 #include <QMessageBox>
+#include <QTimer>
+#include <QDateTime>  // также если используется QDateTime для синуса
+#include <QObject>
+
 
 GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
                            int timeUnit, int offsetX, int offsetY, int passedBarHeight,
@@ -32,7 +36,16 @@ GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, 
     setFlag(ItemSendsGeometryChanges);
     setAcceptHoverEvents(true);
 
+    m_pulseTimer = new QTimer();
+    QObject::connect(m_pulseTimer, &QTimer::timeout, this, [this]() {
+        m_currentAlpha = 0.5 + 0.5 * std::sin(QDateTime::currentMSecsSinceEpoch() / (200.0 - m_icost));
+        update();
+    });
+
+
+
 }
+
 
 
 
@@ -166,6 +179,12 @@ void GanttBarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     QRectF r = rect();
 
     int setupWidth = m_isetupTime * m_itimeUnit;
+    // Создаём локальную переменную color
+    QColor color = m_isManuallyHighlighted ? Qt::yellow : m_assignedColor;
+
+    if (m_pulsing) {
+        color.setAlphaF(m_currentAlpha);
+    }
 
 
     if (m_isManuallyHighlighted) {
@@ -201,3 +220,18 @@ void GanttBarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     painter->drawText(textRect, Qt::AlignCenter, m_innerLabel);
 }
 
+void GanttBarItem::startPulse() {
+    if (!m_pulsing) {
+        m_pulsing = true;
+        m_pulseTimer->start(50);
+    }
+}
+
+void GanttBarItem::stopPulse() {
+    if (m_pulsing) {
+        m_pulsing = false;
+        m_pulseTimer->stop();
+        m_currentAlpha = 1.0;
+        update();
+    }
+}

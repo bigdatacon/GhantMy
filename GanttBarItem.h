@@ -2,7 +2,7 @@
 #include <QGraphicsRectItem>
 #include <QPen>
 
-class GanttBarItem : public QGraphicsRectItem {
+class GanttBarItem :public QObject, public QGraphicsRectItem {
 public:
     GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
                                int timeUnit, int offsetX, int offsetY, int barHeight, QColor color, bool isHighlighted, int setupTime
@@ -15,8 +15,9 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+    void startPulse() ;
 
-
+    void stopPulse() ;
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -47,6 +48,11 @@ private:
     int m_icost;
 
     QString m_innerLabel = nullptr;
+
+    QTimer *m_pulseTimer = nullptr;
+    qreal m_currentAlpha = 1.0;
+    bool m_pulsing = false;
+
 
 
 

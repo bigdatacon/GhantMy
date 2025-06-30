@@ -370,3 +370,21 @@ void GanttView::clearHighlights() {
         }
     }
 }
+
+
+void GanttView::startCostPulse() {
+    for (QGraphicsItem *item : m_scene->items()) {
+        if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
+            bar->startPulse();
+        }
+    }
+}
+
+void GanttView::stopCostPulse() {
+    for (QGraphicsItem *item : m_scene->items()) {
+        if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
+            bar->stopPulse();
+        }
+    }
+}
+
