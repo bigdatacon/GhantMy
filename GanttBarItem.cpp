@@ -7,45 +7,6 @@
 #include <cmath> // убедитесь, что подключили этот заголовок
 #include <QMessageBox>
 
-
-//GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
-//                           int timeUnit, int offsetX, int offsetY, int passedBarHeight,
-//                           QColor color, bool isHighlighted, int setupTime, int cost, const QString &innerLabelTex )
-//    : m_opId(id),
-//      m_jobId(jobId),
-//      m_startTime(startTime),
-//      m_duration(duration),
-//      m_itimeUnit(timeUnit),  // сохраняем
-//      m_isetupTime(setupTime),  // сохраняем
-//      m_defaultColor(Qt::blue),
-//      m_assignedColor(color),
-//      m_bisHighlighted(isHighlighted),
-//      m_isManuallyHighlighted(isHighlighted),
-//      m_icost(cost)
-//{
-//    int x = offsetX + startTime * timeUnit;
-//    int width = duration * timeUnit;
-
-//    setRect(x, offsetY, width, passedBarHeight);
-//    setBrush(isHighlighted ? Qt::yellow : m_assignedColor);
-//    setFlag(ItemIsMovable);
-//    setFlag(ItemSendsGeometryChanges);
-//    setAcceptHoverEvents(true);
-
-//    // Добавляем текст внутрь бара
-//    m_innerLabel = new QGraphicsTextItem(innerLabelTex, this);
-//    QFont textFont;
-//    textFont.setPointSizeF(std::max(passedBarHeight * 0.4, 8.0)); // минимум 8
-//    m_innerLabel->setFont(textFont);
-
-//    m_innerLabel->adjustSize();
-//    qreal textX = 2;  // небольшой левый отступ
-//    qreal textY = (passedBarHeight - m_innerLabel->boundingRect().height()) / 2;
-//    m_innerLabel->setPos(textX, textY);
-
-//}
-
-
 GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
                            int timeUnit, int offsetX, int offsetY, int passedBarHeight,
                            QColor color, bool isHighlighted, int setupTime, int cost, const QString &innerLabelTex)
@@ -71,31 +32,6 @@ GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, 
     setFlag(ItemSendsGeometryChanges);
     setAcceptHoverEvents(true);
 
-//    // Добавляем текст внутрь бара
-//    m_innerLabel = new QGraphicsTextItem(innerLabelTex, this);
-//    QFont textFont;
-//    textFont.setPointSizeF(std::max(passedBarHeight * 0.4, 8.0)); // минимум 8
-//    m_innerLabel->setFont(textFont);
-
-//    m_innerLabel->setDefaultTextColor(Qt::white);
-
-
-//    m_innerLabel->adjustSize();
-//    qreal textX = 2;  // небольшой левый отступ
-//    qreal textY = (passedBarHeight - m_innerLabel->boundingRect().height()) / 2;
-//    m_innerLabel->setPos(textX, textY);
-
-    // 💬 Вывод всех данных на печать
-    qDebug() << "Создан GanttBarItem:";
-    qDebug() << "  ID:" << id;
-    qDebug() << "  Machine ID:" << machineId;
-    qDebug() << "  Job ID:" << jobId;
-    qDebug() << "  Start Time:" << startTime;
-    qDebug() << "  Duration:" << duration;
-    qDebug() << "  Time Unit:" << timeUnit;
-    qDebug() << "  Setup Time:" << setupTime;
-    qDebug() << "  Cost:" << cost;
-    qDebug() << "  Inner Label Text:" << innerLabelTex;
 }
 
 
@@ -222,36 +158,6 @@ void GanttBarItem::drawArrow(QGraphicsScene *scene, QPointF from, QPointF to) {
     arrow->setData(0, "arrow");
 }
 
-
-//void GanttBarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-//{
-//    Q_UNUSED(option);
-//    Q_UNUSED(widget);
-
-//    QRectF r = rect();
-
-//    int setupWidth = m_isetupTime * m_itimeUnit;
-
-//    if (setupWidth > 0 && setupWidth < r.width()) {
-//        // Наладка (штриховка)
-//        QRectF setupRect(r.left(), r.top(), setupWidth, r.height());
-
-//        QBrush hatchBrush(m_assignedColor, Qt::DiagCrossPattern);
-//        painter->setBrush(hatchBrush);
-//        painter->drawRect(setupRect);
-
-//        // Основная работа
-//        QRectF workRect(r.left() + setupWidth, r.top(), r.width() - setupWidth, r.height());
-//        painter->setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
-//        painter->drawRect(workRect);
-//    } else {
-//        // Без наладки
-//        painter->setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
-//        painter->drawRect(r);
-//    }
-//}
-
-
 void GanttBarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
@@ -261,23 +167,28 @@ void GanttBarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 
     int setupWidth = m_isetupTime * m_itimeUnit;
 
-    if (setupWidth > 0 && setupWidth < r.width()) {
-        // Наладка (штриховка)
-        QRectF setupRect(r.left(), r.top(), setupWidth, r.height());
 
+    if (m_isManuallyHighlighted) {
+        // Если выделено — красим всю область в жёлтый
+        painter->setBrush(Qt::yellow);
+        painter->drawRect(r);
+    } else if (setupWidth > 0 && setupWidth < r.width()) {
+        // Наладка
+        QRectF setupRect(r.left(), r.top(), setupWidth, r.height());
         QBrush hatchBrush(m_assignedColor, Qt::DiagCrossPattern);
         painter->setBrush(hatchBrush);
         painter->drawRect(setupRect);
 
         // Основная работа
         QRectF workRect(r.left() + setupWidth, r.top(), r.width() - setupWidth, r.height());
-        painter->setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
+        painter->setBrush(m_assignedColor);
         painter->drawRect(workRect);
     } else {
         // Без наладки
-        painter->setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
+        painter->setBrush(m_assignedColor);
         painter->drawRect(r);
     }
+
 
     // 💬 Рисуем текст поверх бара
 //    painter->setPen(Qt::white); // цвет текста

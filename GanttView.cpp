@@ -64,9 +64,6 @@ void GanttView::populateScene() {
 
     qreal relativeOffsetX = viewWidth * (-0.04);  // 5% от ширины видимой области
 
-
-
-
     int availableHeight = viewHeight - titleHeight - topPadding - bottomPadding;
     int spacingY = availableHeight / axisCount;
     int barHeight = spacingY * 0.2;
@@ -151,9 +148,18 @@ void GanttView::populateScene() {
             QColor color = m_jobColorMap.value(op.jobId, Qt::blue);
 
             QString labelText;
+            QString tooltipText ;
 
             if (m_title.contains("Машин")) {
                 labelText = QString("J%1").arg(op.jobId);
+
+                tooltipText = QString("M%1; J%2; Start: %3; Setup: %4; Dur: %5; Cost: %6")
+                    .arg(op.machineId)
+                    .arg(op.jobId)
+                    .arg(op.startTime)
+                    .arg(op.setupTime)
+                    .arg(op.duration)
+                    .arg(op.cost);
             }
             else {
                 QVector<OperationData> relatedTopOps = m_pDB->bottomOpIdToGroup.value(op.id);
@@ -165,10 +171,23 @@ void GanttView::populateScene() {
                 std::sort(sortedMachines.begin(), sortedMachines.end());
 
                 QStringList machineLabels;
-                for (int mid : sortedMachines)
+                QStringList machineLabelsfortooltip;
+                for (int mid : sortedMachines){
                     machineLabels << QString("M%1").arg(mid);
+                    machineLabelsfortooltip << QString::number(mid);
+                }
+
 
                 labelText = machineLabels.join(",");
+//                tooltipText = machineLabelsfortooltip.join(",");
+
+                tooltipText = QString("M%1; J%2; Start: %3; Setup: %4; Dur: %5; Cost: %6")
+                    .arg(machineLabelsfortooltip.join(","))
+                    .arg(op.jobId)
+                    .arg(op.startTime)
+                    .arg(op.setupTime)
+                    .arg(op.duration)
+                    .arg(op.cost);
 
             }
 
@@ -188,7 +207,10 @@ void GanttView::populateScene() {
                 op.cost,
                 labelText
             );
-            bar->setToolTip(QString("%1\nSetup: %2\nCost: %3").arg(op.name).arg(op.setupTime).arg(op.cost));
+
+
+            bar->setToolTip(tooltipText);
+
             m_scene->addItem(bar);
         }
 
