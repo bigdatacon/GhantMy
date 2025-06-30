@@ -7,31 +7,58 @@
 #include <cmath> // убедитесь, что подключили этот заголовок
 
 
+//GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
+//                           int timeUnit, int offsetX, int offsetY, int passedBarHeight, QColor color,  bool isHighlighted,  int setupTime):
+////    m_defaultColor(Qt::blue),
+//    m_defaultColor(color),
+//    m_assignedColor(color),
+//    m_bisHighlighted(isHighlighted),
+
+
+//   m_opId(id),
+//   m_jobId(jobId),
+//   m_startTime(startTime),
+//   m_duration(duration),
+//   m_isetupTime(setupTime),
+//   m_itimeUnit(timeUnit)
+
+
+//{
+//    int x = offsetX + startTime * timeUnit;
+//    int width = duration * timeUnit;
+
+//    setRect(x, offsetY, width, passedBarHeight);
+//    setBrush(color);
+//    setFlag(ItemIsMovable);
+//    setFlag(ItemSendsGeometryChanges);
+//    setAcceptHoverEvents(true);
+//    setHighlighted(isHighlighted);
+//}
+
 GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
-                           int timeUnit, int offsetX, int offsetY, int passedBarHeight, QColor color,  bool isHighlighted):
-//    m_defaultColor(Qt::blue),
-    m_defaultColor(color),
-    m_assignedColor(color),
-    m_bisHighlighted(isHighlighted),
-
-
-   m_opId(id),
-   m_jobId(jobId),
-   m_startTime(startTime),
-   m_duration(duration)
-
-
+                           int timeUnit, int offsetX, int offsetY, int passedBarHeight,
+                           QColor color, bool isHighlighted, int setupTime)
+    : m_opId(id),
+      m_jobId(jobId),
+      m_startTime(startTime),
+      m_duration(duration),
+      m_itimeUnit(timeUnit),  // сохраняем
+      m_isetupTime(setupTime),  // сохраняем
+      m_defaultColor(Qt::blue),
+      m_assignedColor(color),
+      m_bisHighlighted(isHighlighted),
+      m_isManuallyHighlighted(isHighlighted)
 {
     int x = offsetX + startTime * timeUnit;
     int width = duration * timeUnit;
 
     setRect(x, offsetY, width, passedBarHeight);
-    setBrush(color);
+    setBrush(isHighlighted ? Qt::yellow : m_assignedColor);
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
     setAcceptHoverEvents(true);
-    setHighlighted(isHighlighted);
 }
+
 
 
 void GanttBarItem::setHighlighted(bool on) {
@@ -40,47 +67,6 @@ void GanttBarItem::setHighlighted(bool on) {
 }
 
 
-
-
-//void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-//    m_dragStart = event->pos();
-
-//    clearAllHighlightsExceptThis();  // Сбросить всё кроме текущего
-
-//    m_isManuallyHighlighted = !m_isManuallyHighlighted;
-//    setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
-
-//    QGraphicsRectItem::mousePressEvent(event);
-
-
-//    auto *scenePtr = scene();
-//    if (!scenePtr) return;
-
-//    QObject *view = scenePtr->parent();
-//    auto *ganttView = qobject_cast<GanttView*>(view);
-
-//    if (ganttView) {
-//        ganttView->printLinkedOperations(m_opId, m_jobId, m_startTime, m_duration);
-//    }
-
-//}
-
-//void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-//    m_dragStart = event->pos();
-
-//    auto *scenePtr = scene();
-//    if (!scenePtr) return;
-
-//    QVariant viewVar = scenePtr->property("view");
-//    if (viewVar.isValid()) {
-//        auto *view = static_cast<GanttView*>(viewVar.value<void*>());
-//        if (view) {
-//            view->printLinkedOperations(m_opId, m_jobId, m_startTime, m_duration);
-//        }
-//    }
-
-//    QGraphicsRectItem::mousePressEvent(event);
-//}
 
 void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     m_dragStart = event->pos();
@@ -162,5 +148,34 @@ void GanttBarItem::drawArrow(QGraphicsScene *scene, QPointF from, QPointF to) {
     arrowHead << to << arrowP1 << arrowP2;
     auto *arrow = scene->addPolygon(arrowHead, pen, QBrush(Qt::red));
     arrow->setData(0, "arrow");
+}
+
+
+void GanttBarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+
+    QRectF r = rect();
+
+    int setupWidth = m_isetupTime * m_itimeUnit;
+
+    if (setupWidth > 0 && setupWidth < r.width()) {
+        // Наладка (штриховка)
+        QRectF setupRect(r.left(), r.top(), setupWidth, r.height());
+
+        QBrush hatchBrush(m_assignedColor, Qt::DiagCrossPattern);
+        painter->setBrush(hatchBrush);
+        painter->drawRect(setupRect);
+
+        // Основная работа
+        QRectF workRect(r.left() + setupWidth, r.top(), r.width() - setupWidth, r.height());
+        painter->setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
+        painter->drawRect(workRect);
+    } else {
+        // Без наладки
+        painter->setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
+        painter->drawRect(r);
+    }
 }
 

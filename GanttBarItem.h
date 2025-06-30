@@ -5,12 +5,14 @@
 class GanttBarItem : public QGraphicsRectItem {
 public:
     GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
-                               int timeUnit, int offsetX, int offsetY, int barHeight, QColor color, bool isHighlighted);
+                               int timeUnit, int offsetX, int offsetY, int barHeight, QColor color, bool isHighlighted, int setupTime);
 
 
     void setHighlighted(bool on);
     QString getOpId() const;
     static void drawArrow(QGraphicsScene *scene, QPointF from, QPointF to) ;
+
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 
 
@@ -33,6 +35,9 @@ private:
     QString m_opId;
     int m_jobId;
     int m_startTime;
+    int m_isetupTime;
+    int m_itimeUnit = 1;
+
     int m_duration;
 
 };
