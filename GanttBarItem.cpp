@@ -96,6 +96,26 @@ void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
 
 
+//void GanttBarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+//    bool collided = false;
+//    for (auto *item : collidingItems()) {
+//        if (dynamic_cast<GanttBarItem*>(item)) {
+//            collided = true;
+//            break;
+//        }
+//    }
+
+//    if (collided) {
+//        if (!m_isManuallyHighlighted)
+//            setBrush(Qt::black);  // только если не вручную выделен
+//    } else {
+//        // возвращаем нужный цвет
+//        setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
+//    }
+
+//    QGraphicsRectItem::mouseReleaseEvent(event);
+//}
+
 void GanttBarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     bool collided = false;
     for (auto *item : collidingItems()) {
@@ -111,6 +131,18 @@ void GanttBarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     } else {
         // возвращаем нужный цвет
         setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
+    }
+
+    // 💡 Здесь добавляем вызов обновления стрелок
+    auto *scenePtr = scene();
+    if (scenePtr) {
+        QVariant viewVar = scenePtr->property("view");
+        if (viewVar.isValid()) {
+            GanttView* view = static_cast<GanttView*>(viewVar.value<void*>());
+            if (view) {
+                view->printLinkedOperations(m_opId, m_jobId, m_startTime, m_duration);
+            }
+        }
     }
 
     QGraphicsRectItem::mouseReleaseEvent(event);
