@@ -19,6 +19,9 @@ public:
 
     void stopPulse() ;
 
+
+
+
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;

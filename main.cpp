@@ -125,9 +125,15 @@ int main(int argc, char *argv[]) {
     QHBoxLayout *menuLayout = new QHBoxLayout(menuWidget);
     QPushButton *showCostButton = new QPushButton("ShowCost");
     QPushButton *offCostButton = new QPushButton("OffCost");
+    // Кнопка Refresh
+    QPushButton *refreshButton = new QPushButton("Refresh");
+    menuLayout->addWidget(refreshButton);
+
     menuLayout->addWidget(showCostButton);
     menuLayout->addWidget(offCostButton);
     menuLayout->addStretch();
+
+
 
     // Графики
     GanttView *topChart = new GanttView("График Машин", GanttDB::instance().topOperations, &GanttDB::instance(), GanttDB::instance().maxFinishTop, GanttDB::instance().uniqueJobCountTop);
@@ -148,6 +154,9 @@ int main(int argc, char *argv[]) {
     layout->addWidget(menuWidget);
     layout->addWidget(splitter);
 
+
+
+
     // Обработка кнопок
     QObject::connect(showCostButton, &QPushButton::clicked, [&]() {
         if (GanttDB::instance().topView) GanttDB::instance().topView->startCostPulse();
@@ -159,6 +168,25 @@ int main(int argc, char *argv[]) {
         if (GanttDB::instance().bottomView) GanttDB::instance().bottomView->stopCostPulse();
     });
 
+    // Слот для Refresh
+    QObject::connect(refreshButton, &QPushButton::clicked, [&]() {
+        if (GanttDB::instance().topView) {
+            GanttDB::instance().topView->clearHighlights();
+        }
+        if (GanttDB::instance().bottomView) {
+            GanttDB::instance().bottomView->clearHighlights();
+        }
+        GanttDB::instance().loadFromDatabase();
+        if (GanttDB::instance().topView) {
+            GanttDB::instance().topView->updateOperations(GanttDB::instance().topOperations);
+        }
+        if (GanttDB::instance().bottomView) {
+            GanttDB::instance().bottomView->updateOperations(GanttDB::instance().bottomOperations);
+        }
+    });
+
     mainWidget.show();
     return app.exec();
 }
+
+

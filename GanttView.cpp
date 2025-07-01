@@ -388,3 +388,8 @@ void GanttView::stopCostPulse() {
     }
 }
 
+
+void GanttView::updateOperations(const QVector<OperationData> &ops) {
+    m_operations = ops;
+    populateScene();
+}

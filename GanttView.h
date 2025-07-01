@@ -17,6 +17,8 @@ public:
      void startCostPulse();
      void stopCostPulse();
 
+     void updateOperations(const QVector<OperationData> &ops) ;
+
 
 protected:
     void wheelEvent(QWheelEvent *event) override;
