@@ -32,7 +32,15 @@ GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, 
 
     setRect(x, offsetY, width, passedBarHeight);
     setBrush(isHighlighted ? Qt::yellow : m_assignedColor);
+//    setFlag(ItemIsMovable);
+
+    // Было
     setFlag(ItemIsMovable);
+
+    // Стало
+    setFlag(ItemIsMovable, false); // По умолчанию не двигается
+
+
     setFlag(ItemSendsGeometryChanges);
     setAcceptHoverEvents(true);
 

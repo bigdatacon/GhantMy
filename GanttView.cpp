@@ -404,3 +404,4 @@ void GanttView::setEditMode(bool on) {
         }
     }
 }
+
