@@ -48,15 +48,10 @@ GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, 
 
 }
 
-
-
-
 void GanttBarItem::setHighlighted(bool on) {
     m_isManuallyHighlighted = on;
     setBrush(on ? Qt::yellow : m_assignedColor);
 }
-
-
 
 void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
@@ -102,11 +97,6 @@ void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
 }
 
-
-
-
-
-
 void GanttBarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     bool collided = false;
     for (auto *item : collidingItems()) {
@@ -138,6 +128,9 @@ void GanttBarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 
     QGraphicsRectItem::mouseReleaseEvent(event);
 }
+
+
+
 
 
 void GanttBarItem::clearAllHighlightsExceptThis() {
@@ -185,8 +178,7 @@ void GanttBarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     // Финальный цвет
     QColor finalColor = m_isManuallyHighlighted ? Qt::yellow : m_assignedColor;
 
-    // Если включена пульсация и не выделено вручную — применяем alpha
-    if (m_pulsing && !m_isManuallyHighlighted) {
+    if (m_pulsing ) {
         finalColor.setAlphaF(m_currentAlpha);
 
         double penWidth = std::min(10.0, 1.0 + m_icost / 50.0);
