@@ -128,10 +128,16 @@ int main(int argc, char *argv[]) {
     // Кнопка Refresh
     QPushButton *refreshButton = new QPushButton("Refresh");
     menuLayout->addWidget(refreshButton);
+    QPushButton *editModeBtn = new QPushButton("Edit Mode");
+    QPushButton *viewModeBtn = new QPushButton("View Mode");
+
 
     menuLayout->addWidget(showCostButton);
     menuLayout->addWidget(offCostButton);
     menuLayout->addStretch();
+
+    menuLayout->addWidget(editModeBtn);
+    menuLayout->addWidget(viewModeBtn);
 
 
 
@@ -184,6 +190,17 @@ int main(int argc, char *argv[]) {
             GanttDB::instance().bottomView->updateOperations(GanttDB::instance().bottomOperations);
         }
     });
+
+    QObject::connect(editModeBtn, &QPushButton::clicked, [&]() {
+        topChart->setEditMode(true);
+        bottomChart->setEditMode(true);
+    });
+
+    QObject::connect(viewModeBtn, &QPushButton::clicked, [&]() {
+        topChart->setEditMode(false);
+        bottomChart->setEditMode(false);
+    });
+
 
     mainWidget.show();
     return app.exec();

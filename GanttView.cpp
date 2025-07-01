@@ -393,3 +393,14 @@ void GanttView::updateOperations(const QVector<OperationData> &ops) {
     m_operations = ops;
     populateScene();
 }
+
+
+
+void GanttView::setEditMode(bool on) {
+    m_beditMode = on;
+    for (QGraphicsItem *item : m_scene->items()) {
+        if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
+            bar->setFlag(QGraphicsItem::ItemIsMovable, m_beditMode);
+        }
+    }
+}

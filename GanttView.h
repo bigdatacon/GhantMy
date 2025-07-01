@@ -19,6 +19,9 @@ public:
 
      void updateOperations(const QVector<OperationData> &ops) ;
 
+     void setEditMode(bool on);
+
+
 
 protected:
     void wheelEvent(QWheelEvent *event) override;
@@ -41,6 +44,9 @@ private:
 
     void populateScene();  // Добавляет оси, бары, подписи
     void generateJobColorMap();
+
+    bool m_beditMode = false;
+
 
 };
 
