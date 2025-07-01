@@ -43,7 +43,6 @@ GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, 
     });
 
 
-
 }
 
 
@@ -171,54 +170,106 @@ void GanttBarItem::drawArrow(QGraphicsScene *scene, QPointF from, QPointF to) {
     arrow->setData(0, "arrow");
 }
 
+//void GanttBarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+//{
+//    Q_UNUSED(option);
+//    Q_UNUSED(widget);
+
+//    QRectF r = rect();
+
+//    int setupWidth = m_isetupTime * m_itimeUnit;
+//    // Создаём локальную переменную color
+//    QColor color = m_isManuallyHighlighted ? Qt::yellow : m_assignedColor;
+
+//    QColor pulseColor = m_assignedColor;
+//    if (m_pulsing) {
+//        pulseColor.setAlphaF(m_currentAlpha);
+//    }
+//    painter->setBrush(pulseColor);
+
+
+////    if (m_pulsing) {
+////        color.setAlphaF(m_currentAlpha);
+////    }
+
+
+//    if (m_isManuallyHighlighted) {
+//        // Если выделено — красим всю область в жёлтый
+//        painter->setBrush(Qt::yellow);
+//        painter->drawRect(r);
+//    } else if (setupWidth > 0 && setupWidth < r.width()) {
+//        // Наладка
+//        QRectF setupRect(r.left(), r.top(), setupWidth, r.height());
+//        QBrush hatchBrush(m_assignedColor, Qt::DiagCrossPattern);
+//        painter->setBrush(hatchBrush);
+//        painter->drawRect(setupRect);
+
+//        // Основная работа
+//        QRectF workRect(r.left() + setupWidth, r.top(), r.width() - setupWidth, r.height());
+//        painter->setBrush(m_assignedColor);
+//        painter->drawRect(workRect);
+//    } else {
+//        // Без наладки
+//        painter->setBrush(m_assignedColor);
+//        painter->drawRect(r);
+//    }
+
+
+//    // 💬 Рисуем текст поверх бара
+////    painter->setPen(Qt::white); // цвет текста
+//    QFont font = painter->font();
+//    font.setPointSizeF(std::max(r.height() * 0.4, 8.0));
+//    painter->setFont(font);
+
+//    // Центрируем текст
+//    QRectF textRect = r;
+//    painter->drawText(textRect, Qt::AlignCenter, m_innerLabel);
+//}
+
 void GanttBarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
     QRectF r = rect();
-
     int setupWidth = m_isetupTime * m_itimeUnit;
-    // Создаём локальную переменную color
-    QColor color = m_isManuallyHighlighted ? Qt::yellow : m_assignedColor;
 
-    if (m_pulsing) {
-        color.setAlphaF(m_currentAlpha);
+    // Финальный цвет
+    QColor finalColor = m_isManuallyHighlighted ? Qt::yellow : m_assignedColor;
+
+    // Если включена пульсация и не выделено вручную — применяем alpha
+    if (m_pulsing && !m_isManuallyHighlighted) {
+        finalColor.setAlphaF(m_currentAlpha);
     }
 
-
     if (m_isManuallyHighlighted) {
-        // Если выделено — красим всю область в жёлтый
         painter->setBrush(Qt::yellow);
         painter->drawRect(r);
     } else if (setupWidth > 0 && setupWidth < r.width()) {
         // Наладка
         QRectF setupRect(r.left(), r.top(), setupWidth, r.height());
-        QBrush hatchBrush(m_assignedColor, Qt::DiagCrossPattern);
+        QBrush hatchBrush(finalColor, Qt::DiagCrossPattern);
         painter->setBrush(hatchBrush);
         painter->drawRect(setupRect);
 
-        // Основная работа
+        // Основная часть
         QRectF workRect(r.left() + setupWidth, r.top(), r.width() - setupWidth, r.height());
-        painter->setBrush(m_assignedColor);
+        painter->setBrush(finalColor);
         painter->drawRect(workRect);
     } else {
         // Без наладки
-        painter->setBrush(m_assignedColor);
+        painter->setBrush(finalColor);
         painter->drawRect(r);
     }
 
-
-    // 💬 Рисуем текст поверх бара
-//    painter->setPen(Qt::white); // цвет текста
+    // Рисуем текст
     QFont font = painter->font();
     font.setPointSizeF(std::max(r.height() * 0.4, 8.0));
     painter->setFont(font);
 
-    // Центрируем текст
-    QRectF textRect = r;
-    painter->drawText(textRect, Qt::AlignCenter, m_innerLabel);
+    painter->drawText(r, Qt::AlignCenter, m_innerLabel);
 }
+
 
 void GanttBarItem::startPulse() {
     if (!m_pulsing) {
