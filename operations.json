@@ -1,19 +1,19 @@
 {
   "top": [
     { "id": "1_up", "machineId": 1, "jobId": 1, "startTime": 0, "duration": 4, "setupTime": 2, "predecessors": [], "name": "1", "cost": 100 },
-    { "id": "2_up", "machineId": 1, "jobId": 3, "startTime": 4, "duration": 3, "setupTime": 1, "predecessors": ["1_up"], "name": "3", "cost": 120 },
-    { "id": "3_up", "machineId": 2, "jobId": 2, "startTime": 0, "duration": 4, "setupTime": 2, "predecessors": [], "name": "1", "cost": 100 },
+    { "id": "2_up", "machineId": 1, "jobId": 3, "startTime": 4, "duration": 3, "setupTime": 1, "predecessors": ["1_up"], "name": "3", "cost": 20 },
+    { "id": "3_up", "machineId": 2, "jobId": 2, "startTime": 0, "duration": 4, "setupTime": 2, "predecessors": [], "name": "1", "cost": 20 },
     { "id": "4_up", "machineId": 2, "jobId": 2, "startTime": 4, "duration": 2, "setupTime": 1, "predecessors": ["3_up"], "name": "2", "cost": 110 },
-    { "id": "5_up", "machineId": 3, "jobId": 1, "startTime": 0, "duration": 4, "setupTime": 2, "predecessors": [], "name": "1", "cost": 100 },
+    { "id": "5_up", "machineId": 3, "jobId": 1, "startTime": 0, "duration": 4, "setupTime": 2, "predecessors": [], "name": "1", "cost": 70 },
     { "id": "6_up", "machineId": 3, "jobId": 2, "startTime": 4, "duration": 2, "setupTime": 1, "predecessors": [], "name": "2", "cost": 110 },
-    { "id": "7_up", "machineId": 3, "jobId": 3, "startTime": 7, "duration": 9, "setupTime": 1, "predecessors": ["5_up", "2_up"], "name": "3", "cost": 120 }
+    { "id": "7_up", "machineId": 3, "jobId": 3, "startTime": 7, "duration": 9, "setupTime": 1, "predecessors": ["5_up", "2_up"], "name": "3", "cost": 180 }
   ],
   "bottom": [
 
-    { "id": "2_down", "machineId": 1, "jobId": 1, "startTime": 0, "duration": 4, "setupTime": 2, "predecessors": ["1_down"], "name": "1", "cost": 100 },
-    { "id": "3_down", "machineId": 2, "jobId": 2, "startTime": 0, "duration": 4, "setupTime": 2, "predecessors": [], "name": "2", "cost": 110 },
+    { "id": "2_down", "machineId": 1, "jobId": 1, "startTime": 0, "duration": 4, "setupTime": 2, "predecessors": ["1_down"], "name": "1", "cost": 50 },
+    { "id": "3_down", "machineId": 2, "jobId": 2, "startTime": 0, "duration": 4, "setupTime": 2, "predecessors": [], "name": "2", "cost": 40 },
     { "id": "4_down", "machineId": 3, "jobId": 2, "startTime": 4, "duration": 2, "setupTime": 1, "predecessors": ["3_down"], "name": "2", "cost": 110 },
-    { "id": "5_down", "machineId": 1, "jobId": 3, "startTime": 4, "duration": 3, "setupTime": 2, "predecessors": [], "name": "3", "cost": 120 },
-    { "id": "6_down", "machineId": 3, "jobId": 3, "startTime": 7, "duration": 9, "setupTime": 1, "predecessors": ["5_down"], "name": "3", "cost": 120 }
+    { "id": "5_down", "machineId": 1, "jobId": 3, "startTime": 4, "duration": 3, "setupTime": 2, "predecessors": [], "name": "3", "cost": 130 },
+    { "id": "6_down", "machineId": 3, "jobId": 3, "startTime": 7, "duration": 9, "setupTime": 1, "predecessors": ["5_down"], "name": "3", "cost": 160 }
   ]
 }

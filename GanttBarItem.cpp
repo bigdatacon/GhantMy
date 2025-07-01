@@ -38,7 +38,10 @@ GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, 
 
     m_pulseTimer = new QTimer();
     QObject::connect(m_pulseTimer, &QTimer::timeout, this, [this]() {
-        m_currentAlpha = 0.5 + 0.5 * std::sin(QDateTime::currentMSecsSinceEpoch() / (200.0 - m_icost));
+//        m_currentAlpha = 0.5 + 0.5 * std::sin(QDateTime::currentMSecsSinceEpoch() / (200.0 - m_icost));
+        double amplitude = std::min(0.8, 0.3 + m_icost / 500.0);
+        m_currentAlpha = 0.2 + amplitude * (0.5 + 0.5 * std::sin(QDateTime::currentMSecsSinceEpoch() / (200.0 - m_icost)));
+
         update();
     });
 
@@ -170,61 +173,6 @@ void GanttBarItem::drawArrow(QGraphicsScene *scene, QPointF from, QPointF to) {
     arrow->setData(0, "arrow");
 }
 
-//void GanttBarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-//{
-//    Q_UNUSED(option);
-//    Q_UNUSED(widget);
-
-//    QRectF r = rect();
-
-//    int setupWidth = m_isetupTime * m_itimeUnit;
-//    // Создаём локальную переменную color
-//    QColor color = m_isManuallyHighlighted ? Qt::yellow : m_assignedColor;
-
-//    QColor pulseColor = m_assignedColor;
-//    if (m_pulsing) {
-//        pulseColor.setAlphaF(m_currentAlpha);
-//    }
-//    painter->setBrush(pulseColor);
-
-
-////    if (m_pulsing) {
-////        color.setAlphaF(m_currentAlpha);
-////    }
-
-
-//    if (m_isManuallyHighlighted) {
-//        // Если выделено — красим всю область в жёлтый
-//        painter->setBrush(Qt::yellow);
-//        painter->drawRect(r);
-//    } else if (setupWidth > 0 && setupWidth < r.width()) {
-//        // Наладка
-//        QRectF setupRect(r.left(), r.top(), setupWidth, r.height());
-//        QBrush hatchBrush(m_assignedColor, Qt::DiagCrossPattern);
-//        painter->setBrush(hatchBrush);
-//        painter->drawRect(setupRect);
-
-//        // Основная работа
-//        QRectF workRect(r.left() + setupWidth, r.top(), r.width() - setupWidth, r.height());
-//        painter->setBrush(m_assignedColor);
-//        painter->drawRect(workRect);
-//    } else {
-//        // Без наладки
-//        painter->setBrush(m_assignedColor);
-//        painter->drawRect(r);
-//    }
-
-
-//    // 💬 Рисуем текст поверх бара
-////    painter->setPen(Qt::white); // цвет текста
-//    QFont font = painter->font();
-//    font.setPointSizeF(std::max(r.height() * 0.4, 8.0));
-//    painter->setFont(font);
-
-//    // Центрируем текст
-//    QRectF textRect = r;
-//    painter->drawText(textRect, Qt::AlignCenter, m_innerLabel);
-//}
 
 void GanttBarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
@@ -240,7 +188,12 @@ void GanttBarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     // Если включена пульсация и не выделено вручную — применяем alpha
     if (m_pulsing && !m_isManuallyHighlighted) {
         finalColor.setAlphaF(m_currentAlpha);
+
+        double penWidth = std::min(10.0, 1.0 + m_icost / 50.0);
+        QPen pen(Qt::black, penWidth);
+        painter->setPen(pen);
     }
+
 
     if (m_isManuallyHighlighted) {
         painter->setBrush(Qt::yellow);
