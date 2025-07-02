@@ -384,13 +384,37 @@ void GanttView::printLinkedOperations(const QString &opId, int jobId, int m_star
 }
 
 
+//void GanttView::clearHighlights() {
+//    for (QGraphicsItem *item : m_scene->items()) {
+//        if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
+//            bar->setHighlighted(false);
+//        }
+//    }
+//}
+
+
 void GanttView::clearHighlights() {
+    // Сначала снимаем выделение у баров
     for (QGraphicsItem *item : m_scene->items()) {
         if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
             bar->setHighlighted(false);
         }
     }
+
+    // Теперь удаляем стрелки
+    QList<QGraphicsItem *> arrowsToRemove;
+    for (QGraphicsItem *item : m_scene->items()) {
+        if (item->data(0).toString() == "arrow") {
+            arrowsToRemove << item;
+        }
+    }
+    for (QGraphicsItem *arrow : arrowsToRemove) {
+        m_scene->removeItem(arrow);
+        delete arrow;
+    }
 }
+
+
 
 
 void GanttView::startCostPulse() {
@@ -416,15 +440,6 @@ void GanttView::updateOperations(const QVector<OperationData> &ops) {
 }
 
 
-
-//void GanttView::setEditMode(bool on) {
-//    m_beditMode = on;
-//    for (QGraphicsItem *item : m_scene->items()) {
-//        if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
-//            bar->setFlag(QGraphicsItem::ItemIsMovable, m_beditMode);
-//        }
-//    }
-//}
 
 void GanttView::setEditMode(bool on) {
     m_beditMode = on;
