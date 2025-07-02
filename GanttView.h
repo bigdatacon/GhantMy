@@ -23,7 +23,7 @@ public:
      void snapBarsToAxis() ;
 
      bool isEditMode() const;
-
+     void showAddBarDialog();
 
 
 

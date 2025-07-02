@@ -130,6 +130,9 @@ int main(int argc, char *argv[]) {
     menuLayout->addWidget(refreshButton);
     QPushButton *editModeBtn = new QPushButton("Edit Mode");
     QPushButton *viewModeBtn = new QPushButton("View Mode");
+    //кнопка добавить бар
+    QPushButton *addBarButton = new QPushButton("Add Bar");
+    menuLayout->addWidget(addBarButton);
 
 
     menuLayout->addWidget(showCostButton);
@@ -200,6 +203,19 @@ int main(int argc, char *argv[]) {
         topChart->setEditMode(false);
         bottomChart->setEditMode(false);
     });
+
+
+
+    // Коннект
+    QObject::connect(addBarButton, &QPushButton::clicked, [&]() {
+        if (topChart->isEditMode()) {
+            topChart->showAddBarDialog();
+        }
+        if (bottomChart->isEditMode()) {
+            bottomChart->showAddBarDialog();
+        }
+    });
+
 
 
     mainWidget.show();

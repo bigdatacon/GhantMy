@@ -7,7 +7,10 @@
 #include <QDebug>
 #include <QSet>
 
-
+#include <QDialog>
+#include <QFormLayout>
+#include <QLineEdit>
+#include <QDialogButtonBox>
 
 GanttView::GanttView(const QString &title, const QVector<OperationData> &operations, GanttDB* db, int maxFinishTime, int uniqueJobCount)
     : QGraphicsView(), m_title(title), m_operations(operations), m_pDB(db), m_maxFinishTime(maxFinishTime), m_uniqueJobCount(uniqueJobCount) {
@@ -503,3 +506,57 @@ void GanttView::snapBarsToAxis() {
 
 
 bool GanttView::isEditMode() const { return m_beditMode; }
+
+
+void GanttView::showAddBarDialog() {
+    if (!m_beditMode) return;
+
+    QDialog dialog;
+    dialog.setWindowTitle("Добавить новый бар");
+
+    QFormLayout form(&dialog);
+
+    QLineEdit *idEdit = new QLineEdit(&dialog);
+    QLineEdit *startTimeEdit = new QLineEdit(&dialog);
+    QLineEdit *durationEdit = new QLineEdit(&dialog);
+    QLineEdit *setupTimeEdit = new QLineEdit(&dialog);
+    QLineEdit *costEdit = new QLineEdit(&dialog);
+
+    form.addRow("Job ID:", idEdit);
+    form.addRow("Start Time:", startTimeEdit);
+    form.addRow("Duration:", durationEdit);
+    form.addRow("Setup Time:", setupTimeEdit);
+    form.addRow("Cost:", costEdit);
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                               Qt::Horizontal, &dialog);
+    form.addRow(&buttonBox);
+
+    QObject::connect(&buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+
+    if (dialog.exec() == QDialog::Accepted) {
+        // Читаем данные
+        QString id = idEdit->text();
+        int jobId = id.toInt();
+        int startTime = startTimeEdit->text().toInt();
+        int duration = durationEdit->text().toInt();
+        int setupTime = setupTimeEdit->text().toInt();
+        int cost = costEdit->text().toInt();
+
+        // Создаем OperationData
+        OperationData newOp;
+        newOp.id = id;
+        newOp.jobId = jobId;
+        newOp.startTime = startTime;
+        newOp.duration = duration;
+        newOp.setupTime = setupTime;
+        newOp.cost = cost;
+        newOp.machineId = m_title.contains("Машин") ? jobId : 1;  // Допустим, если машинный график, jobId как machineId
+
+        m_operations.append(newOp);
+
+        // Перерисовываем
+        populateScene();
+    }
+}
