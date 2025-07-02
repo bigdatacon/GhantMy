@@ -58,12 +58,12 @@ GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, 
                            int timeUnit, int offsetX, int offsetY, int passedBarHeight,
                            QColor color, bool isHighlighted, int setupTime, int cost, const QString &innerLabelTex)
     : m_opId(id),
-      m_machineId(machineId),  // ✅ теперь сохраняем
+      m_imachineId(machineId),  // ✅ теперь сохраняем
       m_jobId(jobId),
       m_startTime(startTime),
       m_duration(duration),
       m_itimeUnit(timeUnit),
-      m_isetupTime(setupTime),
+      m_setupTime(setupTime),
       m_defaultColor(Qt::blue),
       m_assignedColor(color),
       m_bisHighlighted(isHighlighted),
@@ -149,15 +149,27 @@ void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
     if (event->button() == Qt::RightButton) {
         // Формируем текст с инфо
-        QString info = QString("ID: %1\nMachine ID: %2\nJob ID: %3\nStart: %4\nDuration: %5\nSetup: %6\nName: %7\nCost: %8")
+//        QString info = QString("ID: %1\nMachine ID: %2\nJob ID: %3\nStart: %4\nDuration: %5\nSetup: %6\nName: %7\nCost: %8")
+//                .arg(m_opId)
+////                .arg(m_imachineId)
+//                .arg(m_jobId)
+//                .arg(m_startTime)
+//                .arg(m_duration)
+//                .arg(m_setupTime)
+////                .arg(m_name)
+//                .arg(m_icost);
+
+        QString info = QString("ID: %1\nMachine ID: %2\nJob ID: %3\nStart: %4\nDuration: %5\nSetup: %6\nLabel: %7\nCost: %8")
                 .arg(m_opId)
-//                .arg(m_imachineId)
+                .arg(m_imachineId)
                 .arg(m_jobId)
                 .arg(m_startTime)
                 .arg(m_duration)
                 .arg(m_setupTime)
-//                .arg(m_name)
+                .arg(m_innerLabel)
                 .arg(m_icost);
+
+
 
         QMessageBox::information(nullptr, "Информация о баре", info);
         return; // Чтобы не обрабатывать дальше

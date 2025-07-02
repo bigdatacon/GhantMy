@@ -44,6 +44,7 @@ private:
     int m_itimeUnit = 1;
     int m_machineId;
 
+
     int m_duration;
 
     int m_imachineId;
