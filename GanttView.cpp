@@ -212,6 +212,12 @@ void GanttView::populateScene() {
             bar->setToolTip(tooltipText);
 
             m_scene->addItem(bar);
+
+            qreal centerY = bar->sceneBoundingRect().center().y();
+            qDebug() << "[PopulateScene][Bar]" << bar->getOpId()
+                     << "Axis id:" << id
+                     << "Center Y:" << centerY
+                     << "Expected axis center Y:" << y;
         }
 
     }
@@ -227,6 +233,21 @@ void GanttView::populateScene() {
 
     m_scene->setProperty("db", QVariant::fromValue(static_cast<void*>(m_pDB)));
     m_scene->setProperty("view", QVariant::fromValue(static_cast<void*>(this)));
+
+    m_axisCenters.clear();
+    for (int i = 0; i < sortedAxisIds.size(); ++i) {
+        int id = sortedAxisIds[i];
+        int y = yOffset + spacingY * i;
+        m_axisCenters[id] = y;  // здесь уже координата по сцене
+        qDebug() << "[PopulateScene] Axis id:" << id << "index:" << i
+                 << "Y (center):" << y
+                 << "yOffset:" << yOffset
+                 << "spacingY:" << spacingY;
+    }
+
+
+
+
 }
 
 
@@ -396,6 +417,15 @@ void GanttView::updateOperations(const QVector<OperationData> &ops) {
 
 
 
+//void GanttView::setEditMode(bool on) {
+//    m_beditMode = on;
+//    for (QGraphicsItem *item : m_scene->items()) {
+//        if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
+//            bar->setFlag(QGraphicsItem::ItemIsMovable, m_beditMode);
+//        }
+//    }
+//}
+
 void GanttView::setEditMode(bool on) {
     m_beditMode = on;
     for (QGraphicsItem *item : m_scene->items()) {
@@ -403,5 +433,57 @@ void GanttView::setEditMode(bool on) {
             bar->setFlag(QGraphicsItem::ItemIsMovable, m_beditMode);
         }
     }
+
+    if (!on) {
+        snapBarsToAxis();
+    }
 }
+
+
+void GanttView::snapBarsToAxis() {
+    qDebug() << "=== Snap Bars Start ===";
+
+    for (QGraphicsItem *item : m_scene->items()) {
+        if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
+            QRectF boundingRect = bar->sceneBoundingRect();
+            qreal barCenterY = boundingRect.center().y();
+
+            qDebug() << "Bar ID:" << bar->getOpId()
+                     << "Scene center Y:" << barCenterY;
+
+            // Найти ближайшую ось
+            qreal minDistance = std::numeric_limits<qreal>::max();
+            qreal closestYCenter = barCenterY;
+
+            for (auto it = m_axisCenters.constBegin(); it != m_axisCenters.constEnd(); ++it) {
+                qreal axisCenterY = it.value();
+                qreal dist = std::abs(axisCenterY - barCenterY);
+
+                qDebug() << "  Axis id:" << it.key() << "axisCenterY:" << axisCenterY << "dist:" << dist;
+
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closestYCenter = axisCenterY;
+                }
+            }
+
+            // Рассчитать сдвиг относительно текущего центра
+            QPointF currentPos = bar->pos();
+            QRectF localRect = bar->rect();
+
+            qreal offsetY = closestYCenter - boundingRect.center().y();
+            QPointF newPos = currentPos + QPointF(0, offsetY);
+
+            bar->setPos(newPos);
+
+            qDebug() << "  --> Snapped to center Y:" << closestYCenter
+                     << "New pos:" << newPos;
+        }
+    }
+
+    qDebug() << "=== Snap Bars End ===";
+}
+
+
+
 

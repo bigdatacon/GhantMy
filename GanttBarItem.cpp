@@ -140,7 +140,6 @@ void GanttBarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 
 
 
-
 void GanttBarItem::clearAllHighlightsExceptThis() {
     if (!scene()) return;
 

@@ -20,6 +20,7 @@ public:
      void updateOperations(const QVector<OperationData> &ops) ;
 
      void setEditMode(bool on);
+     void snapBarsToAxis() ;
 
 
 
@@ -46,6 +47,8 @@ private:
     void generateJobColorMap();
 
     bool m_beditMode = false;
+    QMap<int, qreal> m_axisCenters;
+
 
 
 };
