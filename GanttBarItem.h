@@ -56,6 +56,8 @@ private:
     qreal m_currentAlpha = 1.0;
     bool m_pulsing = false;
 
+    bool m_bIsCollided = false;
+
 
 
 

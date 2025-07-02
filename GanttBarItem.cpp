@@ -105,24 +105,52 @@ void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
 }
 
+//void GanttBarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+//    bool collided = false;
+//    for (auto *item : collidingItems()) {
+//        if (dynamic_cast<GanttBarItem*>(item)) {
+//            collided = true;
+//            break;
+//        }
+//    }
+
+//    if (collided) {
+//        if (!m_isManuallyHighlighted)
+//            setBrush(Qt::black);  // только если не вручную выделен
+//    } else {
+//        // возвращаем нужный цвет
+//        setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
+//    }
+
+//    // 💡 Здесь добавляем вызов обновления стрелок
+//    auto *scenePtr = scene();
+//    if (scenePtr) {
+//        QVariant viewVar = scenePtr->property("view");
+//        if (viewVar.isValid()) {
+//            GanttView* view = static_cast<GanttView*>(viewVar.value<void*>());
+//            if (view) {
+//                view->printLinkedOperations(m_opId, m_jobId, m_startTime, m_duration);
+//            }
+//        }
+//    }
+
+//    QGraphicsRectItem::mouseReleaseEvent(event);
+//}
+
 void GanttBarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
-    bool collided = false;
+    m_bIsCollided = false;
+
     for (auto *item : collidingItems()) {
         if (dynamic_cast<GanttBarItem*>(item)) {
-            collided = true;
+            m_bIsCollided = true;
             break;
         }
     }
 
-    if (collided) {
-        if (!m_isManuallyHighlighted)
-            setBrush(Qt::black);  // только если не вручную выделен
-    } else {
-        // возвращаем нужный цвет
-        setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
-    }
+    // Триггерим перерисовку
+    update();
 
-    // 💡 Здесь добавляем вызов обновления стрелок
+    // 💡 Вызов обновления стрелок
     auto *scenePtr = scene();
     if (scenePtr) {
         QVariant viewVar = scenePtr->property("view");
@@ -136,6 +164,7 @@ void GanttBarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 
     QGraphicsRectItem::mouseReleaseEvent(event);
 }
+
 
 
 
@@ -174,6 +203,57 @@ void GanttBarItem::drawArrow(QGraphicsScene *scene, QPointF from, QPointF to) {
 }
 
 
+//void GanttBarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+//{
+//    Q_UNUSED(option);
+//    Q_UNUSED(widget);
+
+//    QRectF r = rect();
+//    int setupWidth = m_isetupTime * m_itimeUnit;
+
+//    // Финальный цвет
+//    QColor finalColor = m_isManuallyHighlighted ? Qt::yellow : m_assignedColor;
+
+
+
+//    if (m_pulsing ) {
+//        finalColor.setAlphaF(m_currentAlpha);
+
+//        double penWidth = std::min(10.0, 1.0 + m_icost / 50.0);
+//        QPen pen(Qt::black, penWidth);
+//        painter->setPen(pen);
+//    }
+
+
+//    if (m_isManuallyHighlighted) {
+//        painter->setBrush(Qt::yellow);
+//        painter->drawRect(r);
+//    } else if (setupWidth > 0 && setupWidth < r.width()) {
+//        // Наладка
+//        QRectF setupRect(r.left(), r.top(), setupWidth, r.height());
+//        QBrush hatchBrush(finalColor, Qt::DiagCrossPattern);
+//        painter->setBrush(hatchBrush);
+//        painter->drawRect(setupRect);
+
+//        // Основная часть
+//        QRectF workRect(r.left() + setupWidth, r.top(), r.width() - setupWidth, r.height());
+//        painter->setBrush(finalColor);
+//        painter->drawRect(workRect);
+//    } else {
+//        // Без наладки
+//        painter->setBrush(finalColor);
+//        painter->drawRect(r);
+//    }
+
+//    // Рисуем текст
+//    QFont font = painter->font();
+//    font.setPointSizeF(std::max(r.height() * 0.4, 8.0));
+//    painter->setFont(font);
+
+//    painter->drawText(r, Qt::AlignCenter, m_innerLabel);
+//}
+
+
 void GanttBarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
@@ -182,45 +262,56 @@ void GanttBarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     QRectF r = rect();
     int setupWidth = m_isetupTime * m_itimeUnit;
 
-    // Финальный цвет
-    QColor finalColor = m_isManuallyHighlighted ? Qt::yellow : m_assignedColor;
+    // Инициализация finalColor
+    QColor finalColor;
+    if (m_bIsCollided /*&& !m_isManuallyHighlighted*/) {
+        finalColor = Qt::gray;
+    } else if (!m_bIsCollided && m_isManuallyHighlighted) {
+        finalColor = Qt::yellow;
+    } else {
+        finalColor = m_assignedColor;
+    }
 
-    if (m_pulsing ) {
+    // Настройка пера
+    if (m_pulsing && !m_bIsCollided) {
         finalColor.setAlphaF(m_currentAlpha);
-
         double penWidth = std::min(10.0, 1.0 + m_icost / 50.0);
         QPen pen(Qt::black, penWidth);
         painter->setPen(pen);
+    } else {
+        // Обычная чёрная тонкая рамка
+        painter->setPen(Qt::black);
     }
 
-
-    if (m_isManuallyHighlighted) {
+    // Закраска
+    if (m_bIsCollided) {
+        painter->setBrush(Qt::gray);
+        painter->drawRect(r);
+    } else if (m_isManuallyHighlighted) {
         painter->setBrush(Qt::yellow);
         painter->drawRect(r);
     } else if (setupWidth > 0 && setupWidth < r.width()) {
-        // Наладка
         QRectF setupRect(r.left(), r.top(), setupWidth, r.height());
         QBrush hatchBrush(finalColor, Qt::DiagCrossPattern);
         painter->setBrush(hatchBrush);
         painter->drawRect(setupRect);
 
-        // Основная часть
         QRectF workRect(r.left() + setupWidth, r.top(), r.width() - setupWidth, r.height());
         painter->setBrush(finalColor);
         painter->drawRect(workRect);
     } else {
-        // Без наладки
         painter->setBrush(finalColor);
         painter->drawRect(r);
     }
 
-    // Рисуем текст
+    // Текст
     QFont font = painter->font();
     font.setPointSizeF(std::max(r.height() * 0.4, 8.0));
     painter->setFont(font);
 
     painter->drawText(r, Qt::AlignCenter, m_innerLabel);
 }
+
 
 
 void GanttBarItem::startPulse() {
