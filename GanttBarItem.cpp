@@ -82,6 +82,24 @@ void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     if (db->topView) db->topView->clearHighlights();
     if (db->bottomView) db->bottomView->clearHighlights();
 
+    // Проверка режима редактирования
+    if (currentView->isEditMode()) {
+        // Проверяем Ctrl + правая кнопка
+        if (event->modifiers() & Qt::ControlModifier && event->button() == Qt::RightButton) {
+            QMessageBox::StandardButton reply;
+            reply = QMessageBox::question(nullptr, "Удаление бара",
+                                          "Вы уверены, что хотите удалить этот бар?",
+                                          QMessageBox::Yes | QMessageBox::No);
+            if (reply == QMessageBox::Yes) {
+                scene()->removeItem(this);
+                delete this;
+                return;  // Важный момент — выходим сразу, чтобы не вызвать базовую обработку
+            } else {
+                return;
+            }
+        }
+    }
+
     if (event->button() == Qt::RightButton) {
         // Формируем текст с инфо
         QString info = QString("ID: %1\nMachine ID: %2\nJob ID: %3\nStart: %4\nDuration: %5\nSetup: %6\nName: %7\nCost: %8")
@@ -105,37 +123,6 @@ void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
 }
 
-//void GanttBarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
-//    bool collided = false;
-//    for (auto *item : collidingItems()) {
-//        if (dynamic_cast<GanttBarItem*>(item)) {
-//            collided = true;
-//            break;
-//        }
-//    }
-
-//    if (collided) {
-//        if (!m_isManuallyHighlighted)
-//            setBrush(Qt::black);  // только если не вручную выделен
-//    } else {
-//        // возвращаем нужный цвет
-//        setBrush(m_isManuallyHighlighted ? Qt::yellow : m_assignedColor);
-//    }
-
-//    // 💡 Здесь добавляем вызов обновления стрелок
-//    auto *scenePtr = scene();
-//    if (scenePtr) {
-//        QVariant viewVar = scenePtr->property("view");
-//        if (viewVar.isValid()) {
-//            GanttView* view = static_cast<GanttView*>(viewVar.value<void*>());
-//            if (view) {
-//                view->printLinkedOperations(m_opId, m_jobId, m_startTime, m_duration);
-//            }
-//        }
-//    }
-
-//    QGraphicsRectItem::mouseReleaseEvent(event);
-//}
 
 void GanttBarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     m_bIsCollided = false;
@@ -202,56 +189,6 @@ void GanttBarItem::drawArrow(QGraphicsScene *scene, QPointF from, QPointF to) {
     arrow->setData(0, "arrow");
 }
 
-
-//void GanttBarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-//{
-//    Q_UNUSED(option);
-//    Q_UNUSED(widget);
-
-//    QRectF r = rect();
-//    int setupWidth = m_isetupTime * m_itimeUnit;
-
-//    // Финальный цвет
-//    QColor finalColor = m_isManuallyHighlighted ? Qt::yellow : m_assignedColor;
-
-
-
-//    if (m_pulsing ) {
-//        finalColor.setAlphaF(m_currentAlpha);
-
-//        double penWidth = std::min(10.0, 1.0 + m_icost / 50.0);
-//        QPen pen(Qt::black, penWidth);
-//        painter->setPen(pen);
-//    }
-
-
-//    if (m_isManuallyHighlighted) {
-//        painter->setBrush(Qt::yellow);
-//        painter->drawRect(r);
-//    } else if (setupWidth > 0 && setupWidth < r.width()) {
-//        // Наладка
-//        QRectF setupRect(r.left(), r.top(), setupWidth, r.height());
-//        QBrush hatchBrush(finalColor, Qt::DiagCrossPattern);
-//        painter->setBrush(hatchBrush);
-//        painter->drawRect(setupRect);
-
-//        // Основная часть
-//        QRectF workRect(r.left() + setupWidth, r.top(), r.width() - setupWidth, r.height());
-//        painter->setBrush(finalColor);
-//        painter->drawRect(workRect);
-//    } else {
-//        // Без наладки
-//        painter->setBrush(finalColor);
-//        painter->drawRect(r);
-//    }
-
-//    // Рисуем текст
-//    QFont font = painter->font();
-//    font.setPointSizeF(std::max(r.height() * 0.4, 8.0));
-//    painter->setFont(font);
-
-//    painter->drawText(r, Qt::AlignCenter, m_innerLabel);
-//}
 
 
 void GanttBarItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

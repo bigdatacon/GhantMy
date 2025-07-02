@@ -487,3 +487,4 @@ void GanttView::snapBarsToAxis() {
 
 
 
+bool GanttView::isEditMode() const { return m_beditMode; }

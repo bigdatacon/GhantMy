@@ -22,6 +22,9 @@ public:
      void setEditMode(bool on);
      void snapBarsToAxis() ;
 
+     bool isEditMode() const;
+
+
 
 
 protected:
