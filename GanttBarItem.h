@@ -49,10 +49,12 @@ private:
 
     int m_imachineId;
     int m_setupTime;
-    QString m_sname;
+//    QString m_sname;
     int m_icost;
 
-    QString m_innerLabel = nullptr;
+//    QString m_innerLabel = nullptr;
+    QString m_innerLabel ;
+
 
     QTimer *m_pulseTimer = nullptr;
     qreal m_currentAlpha = 1.0;
