@@ -42,6 +42,7 @@ private:
     int m_startTime;
     int m_isetupTime;
     int m_itimeUnit = 1;
+    int m_machineId;
 
     int m_duration;
 

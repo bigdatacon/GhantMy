@@ -11,6 +11,8 @@
 #include <QFormLayout>
 #include <QLineEdit>
 #include <QDialogButtonBox>
+#include <QComboBox>
+
 
 GanttView::GanttView(const QString &title, const QVector<OperationData> &operations, GanttDB* db, int maxFinishTime, int uniqueJobCount)
     : QGraphicsView(), m_title(title), m_operations(operations), m_pDB(db), m_maxFinishTime(maxFinishTime), m_uniqueJobCount(uniqueJobCount) {
@@ -562,64 +564,138 @@ bool GanttView::isEditMode() const { return m_beditMode; }
 //}
 
 
-void GanttView::showAddBarDialog() {
-    if (!m_beditMode) return;
+//void GanttView::showAddBarDialog() {
+//    if (!m_beditMode) return;
 
+//    QDialog dialog;
+//    dialog.setWindowTitle("Добавить новый бар");
+
+//    QFormLayout form(&dialog);
+
+//    // Создаем поля
+//    QLineEdit *jobIdEdit = new QLineEdit(&dialog);
+//    QLineEdit *startTimeEdit = new QLineEdit(&dialog);
+//    QLineEdit *durationEdit = new QLineEdit(&dialog);
+//    QLineEdit *setupTimeEdit = new QLineEdit(&dialog);
+//    QLineEdit *costEdit = new QLineEdit(&dialog);
+//    QLineEdit *predsEdit = new QLineEdit(&dialog);
+
+//    form.addRow("Job ID:", jobIdEdit);
+//    form.addRow("Start Time:", startTimeEdit);
+//    form.addRow("Duration:", durationEdit);
+//    form.addRow("Setup Time:", setupTimeEdit);
+//    form.addRow("Cost:", costEdit);
+//    form.addRow("Предшественники (через запятую):", predsEdit);
+
+//    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+//                               Qt::Horizontal, &dialog);
+//    form.addRow(&buttonBox);
+
+//    QObject::connect(&buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+//    QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+
+//    if (dialog.exec() == QDialog::Accepted) {
+//        // Читаем данные
+//        int jobId = jobIdEdit->text().toInt();
+//        int startTime = startTimeEdit->text().toInt();
+//        int duration = durationEdit->text().toInt();
+//        int setupTime = setupTimeEdit->text().toInt();
+//        int cost = costEdit->text().toInt();
+
+//        // Предшественники
+//        QString predsRaw = predsEdit->text();
+//        QStringList predsList = predsRaw.split(",", Qt::SkipEmptyParts);
+//        for (QString &s : predsList) s = s.trimmed();
+
+//        // Генерация ID
+//        int maxNum = 0;
+//        for (const auto& op : m_operations) {
+//            QString idStr = op.id;
+//            if (idStr.contains("_up") || idStr.contains("_down")) {
+//                QString numStr = idStr.section("_", 0, 0);
+//                bool ok;
+//                int num = numStr.toInt(&ok);
+//                if (ok && num > maxNum) maxNum = num;
+//            }
+//        }
+//        int newIdNum = maxNum + 1;
+//        QString newId = QString("%1_%2").arg(newIdNum).arg(m_title.contains("Машин") ? "up" : "down");
+
+//        // Создаем OperationData
+//        OperationData newOp;
+//        newOp.id = newId;
+//        newOp.jobId = jobId;
+//        newOp.startTime = startTime;
+//        newOp.duration = duration;
+//        newOp.setupTime = setupTime;
+//        newOp.cost = cost;
+//        newOp.machineId = m_title.contains("Машин") ? jobId : 1;  // Для машин ставим jobId как machineId, для работ — фиктивно
+
+//        newOp.predecessors = predsList;
+
+//        m_operations.append(newOp);
+
+//        // Перерисовываем
+//        populateScene();
+//    }
+//}
+
+
+void GanttView::showAddBarDialog() {
     QDialog dialog;
     dialog.setWindowTitle("Добавить новый бар");
 
     QFormLayout form(&dialog);
 
-    // Создаем поля
     QLineEdit *jobIdEdit = new QLineEdit(&dialog);
     QLineEdit *startTimeEdit = new QLineEdit(&dialog);
     QLineEdit *durationEdit = new QLineEdit(&dialog);
     QLineEdit *setupTimeEdit = new QLineEdit(&dialog);
     QLineEdit *costEdit = new QLineEdit(&dialog);
+    QLineEdit *innerLabelEdit = new QLineEdit(&dialog);
     QLineEdit *predsEdit = new QLineEdit(&dialog);
 
-    form.addRow("Job ID:", jobIdEdit);
-    form.addRow("Start Time:", startTimeEdit);
-    form.addRow("Duration:", durationEdit);
-    form.addRow("Setup Time:", setupTimeEdit);
-    form.addRow("Cost:", costEdit);
-    form.addRow("Предшественники (через запятую):", predsEdit);
+    QComboBox *graphSelect = new QComboBox(&dialog);
+    graphSelect->addItem("Верхний (Machines)");
+    graphSelect->addItem("Нижний (Jobs)");
 
-    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-                               Qt::Horizontal, &dialog);
+    form.addRow("Job ID:", jobIdEdit);
+    form.addRow("Start time:", startTimeEdit);
+    form.addRow("Duration:", durationEdit);
+    form.addRow("Setup time:", setupTimeEdit);
+    form.addRow("Cost:", costEdit);
+    form.addRow("Label:", innerLabelEdit);
+    form.addRow("Предшественники (через запятую):", predsEdit);
+    form.addRow("График:", graphSelect);
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
     form.addRow(&buttonBox);
 
     QObject::connect(&buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
     QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
     if (dialog.exec() == QDialog::Accepted) {
-        // Читаем данные
         int jobId = jobIdEdit->text().toInt();
         int startTime = startTimeEdit->text().toInt();
         int duration = durationEdit->text().toInt();
         int setupTime = setupTimeEdit->text().toInt();
         int cost = costEdit->text().toInt();
+        QString innerLabel = innerLabelEdit->text();
+        QStringList predsList = predsEdit->text().split(",", Qt::SkipEmptyParts);
 
-        // Предшественники
-        QString predsRaw = predsEdit->text();
-        QStringList predsList = predsRaw.split(",", Qt::SkipEmptyParts);
-        for (QString &s : predsList) s = s.trimmed();
-
-        // Генерация ID
-        int maxNum = 0;
-        for (const auto& op : m_operations) {
-            QString idStr = op.id;
-            if (idStr.contains("_up") || idStr.contains("_down")) {
-                QString numStr = idStr.section("_", 0, 0);
-                bool ok;
-                int num = numStr.toInt(&ok);
-                if (ok && num > maxNum) maxNum = num;
+        // Генерируем ID
+        int newIdNum = 1;
+        for (const auto& op : m_pDB->topOperations + m_pDB->bottomOperations) {
+            bool ok = false;
+            int num = op.id.section("_", 0, 0).toInt(&ok);
+            if (ok && num >= newIdNum) {
+                newIdNum = num + 1;
             }
         }
-        int newIdNum = maxNum + 1;
-        QString newId = QString("%1_%2").arg(newIdNum).arg(m_title.contains("Машин") ? "up" : "down");
 
-        // Создаем OperationData
+        QString suffix = (graphSelect->currentIndex() == 0) ? "up" : "down";
+        QString newId = QString("%1_%2").arg(newIdNum).arg(suffix);
+
         OperationData newOp;
         newOp.id = newId;
         newOp.jobId = jobId;
@@ -627,13 +703,21 @@ void GanttView::showAddBarDialog() {
         newOp.duration = duration;
         newOp.setupTime = setupTime;
         newOp.cost = cost;
-        newOp.machineId = m_title.contains("Машин") ? jobId : 1;  // Для машин ставим jobId как machineId, для работ — фиктивно
+        newOp.machineId = jobId;  // или можно выбрать через отдельное поле
 
         newOp.predecessors = predsList;
 
-        m_operations.append(newOp);
+        if (graphSelect->currentIndex() == 0) {
+            m_pDB->topOperations.append(newOp);
+        } else {
+            m_pDB->bottomOperations.append(newOp);
+        }
 
-        // Перерисовываем
+        // Перерисовать
+        m_operations = (graphSelect->currentIndex() == 0) ? m_pDB->topOperations : m_pDB->bottomOperations;
         populateScene();
+
+        // Вызвать выделение предшественников для нового бара
+        printLinkedOperations(newOp.id, newOp.jobId, newOp.startTime, newOp.duration);
     }
 }

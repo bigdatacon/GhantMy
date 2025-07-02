@@ -11,10 +11,54 @@
 #include <QObject>
 
 
+//GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
+//                           int timeUnit, int offsetX, int offsetY, int passedBarHeight,
+//                           QColor color, bool isHighlighted, int setupTime, int cost, const QString &innerLabelTex)
+//    : m_opId(id),
+//      m_jobId(jobId),
+//      m_startTime(startTime),
+//      m_duration(duration),
+//      m_itimeUnit(timeUnit),
+//      m_isetupTime(setupTime),
+//      m_defaultColor(Qt::blue),
+//      m_assignedColor(color),
+//      m_bisHighlighted(isHighlighted),
+//      m_isManuallyHighlighted(isHighlighted),
+//      m_icost(cost),
+//      m_innerLabel(innerLabelTex)
+//{
+//    int x = offsetX + startTime * timeUnit;
+//    int width = duration * timeUnit;
+
+//    setRect(x, offsetY, width, passedBarHeight);
+//    setBrush(isHighlighted ? Qt::yellow : m_assignedColor);
+////    setFlag(ItemIsMovable);
+
+//    // Было
+//    setFlag(ItemIsMovable);
+
+//    // Стало
+//    setFlag(ItemIsMovable, false); // По умолчанию не двигается
+
+
+//    setFlag(ItemSendsGeometryChanges);
+//    setAcceptHoverEvents(true);
+
+//    m_pulseTimer = new QTimer();
+//    QObject::connect(m_pulseTimer, &QTimer::timeout, this, [this]() {
+////        m_currentAlpha = 0.5 + 0.5 * std::sin(QDateTime::currentMSecsSinceEpoch() / (200.0 - m_icost));
+//        double amplitude = std::min(0.8, 0.3 + m_icost / 500.0);
+//        m_currentAlpha = 0.2 + amplitude * (0.5 + 0.5 * std::sin(QDateTime::currentMSecsSinceEpoch() / (200.0 - m_icost)));
+
+//        update();
+//    });
+//}
+
 GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
                            int timeUnit, int offsetX, int offsetY, int passedBarHeight,
                            QColor color, bool isHighlighted, int setupTime, int cost, const QString &innerLabelTex)
     : m_opId(id),
+      m_machineId(machineId),  // ✅ теперь сохраняем
       m_jobId(jobId),
       m_startTime(startTime),
       m_duration(duration),
@@ -52,9 +96,12 @@ GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, 
 
         update();
     });
-
-
 }
+
+
+
+
+
 
 void GanttBarItem::setHighlighted(bool on) {
     m_isManuallyHighlighted = on;
