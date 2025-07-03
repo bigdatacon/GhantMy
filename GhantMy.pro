@@ -16,12 +16,14 @@ SOURCES += \
     GanttBarItem.cpp \
     GanttDB.cpp \
     GanttView.cpp \
+    MyOpenGLChart.cpp \
     main.cpp
 
 HEADERS += \
     GanttBarItem.h \
     GanttDB.h \
-    GanttView.h
+    GanttView.h \
+    MyOpenGLChart.h
 
 FORMS +=
 

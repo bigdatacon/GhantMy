@@ -8,6 +8,10 @@
 #include "GanttView.h"
 #include "GanttDB.h"
 #include <QObject>
+#include "MyOpenGLChart.h"
+#include <QLabel>
+
+
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
@@ -176,7 +180,36 @@ int main(int argc, char *argv[]) {
     });
 
 
-    QObject::connect(btn3D, &QPushButton::clicked, GanttDB::instance().topView, &GanttView::show3DCostChart);
+    QObject::connect(btn3D, &QPushButton::clicked, [&]() {
+        QVector<BarData> bars;
+        for (const auto &op : GanttDB::instance().topOperations) {
+            BarData bar;
+            bar.id = op.id;
+            bar.cost = op.cost;
+            bars.append(bar);
+        }
+
+        // Окно
+        QWidget *window = new QWidget();
+        window->setWindowTitle("OpenGL 3D Cost Chart");
+        QVBoxLayout *layout = new QVBoxLayout(window);
+
+        // OpenGL виджет
+        MyOpenGLChart *chart = new MyOpenGLChart(bars);
+        layout->addWidget(chart, 1);
+
+        // Горизонтальная линия с подписями
+        QHBoxLayout *labelsLayout = new QHBoxLayout();
+        for (const BarData &bar : bars) {
+            QLabel *label = new QLabel(QString("ID:%1\nCost:%2").arg(bar.id).arg(bar.cost));
+            label->setAlignment(Qt::AlignCenter);
+            labelsLayout->addWidget(label);
+        }
+        layout->addLayout(labelsLayout);
+
+        window->resize(1000, 600);
+        window->show();
+    });
 
 
 

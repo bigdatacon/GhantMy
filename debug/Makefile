@@ -55,12 +55,16 @@ OBJECTS_DIR   = ./
 SOURCES       = ../GanttBarItem.cpp \
 		../GanttDB.cpp \
 		../GanttView.cpp \
-		../main.cpp moc_GanttView.cpp
+		../MyOpenGLChart.cpp \
+		../main.cpp moc_GanttView.cpp \
+		moc_MyOpenGLChart.cpp
 OBJECTS       = GanttBarItem.o \
 		GanttDB.o \
 		GanttView.o \
+		MyOpenGLChart.o \
 		main.o \
-		moc_GanttView.o
+		moc_GanttView.o \
+		moc_MyOpenGLChart.o
 DIST          = ../.gitignore \
 		../operations.json \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -190,9 +194,11 @@ DIST          = ../.gitignore \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		../../GhantMy.pro ../GanttBarItem.h \
 		../GanttDB.h \
-		../GanttView.h ../GanttBarItem.cpp \
+		../GanttView.h \
+		../MyOpenGLChart.h ../GanttBarItem.cpp \
 		../GanttDB.cpp \
 		../GanttView.cpp \
+		../MyOpenGLChart.cpp \
 		../main.cpp
 QMAKE_TARGET  = GhantMy
 DESTDIR       = 
@@ -473,8 +479,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../GanttBarItem.h ../GanttDB.h ../GanttView.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../GanttBarItem.cpp ../GanttDB.cpp ../GanttView.cpp ../main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../GanttBarItem.h ../GanttDB.h ../GanttView.h ../MyOpenGLChart.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../GanttBarItem.cpp ../GanttDB.cpp ../GanttView.cpp ../MyOpenGLChart.cpp ../main.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -506,14 +512,19 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -g -std=gnu++1z -Wall -Wextra -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_GanttView.cpp
+compiler_moc_header_make_all: moc_GanttView.cpp moc_MyOpenGLChart.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_GanttView.cpp
+	-$(DEL_FILE) moc_GanttView.cpp moc_MyOpenGLChart.cpp
 moc_GanttView.cpp: ../GanttView.h \
 		../GanttDB.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/user1/GhantMy/debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/user1/GhantMy -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/Qt3DExtras -I/usr/include/x86_64-linux-gnu/qt5/Qt3DAnimation -I/usr/include/x86_64-linux-gnu/qt5/Qt3DRender -I/usr/include/x86_64-linux-gnu/qt5/Qt3DInput -I/usr/include/x86_64-linux-gnu/qt5/Qt3DLogic -I/usr/include/x86_64-linux-gnu/qt5/Qt3DCore -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../GanttView.h -o moc_GanttView.cpp
+
+moc_MyOpenGLChart.cpp: ../MyOpenGLChart.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/user1/GhantMy/debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/user1/GhantMy -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/Qt3DExtras -I/usr/include/x86_64-linux-gnu/qt5/Qt3DAnimation -I/usr/include/x86_64-linux-gnu/qt5/Qt3DRender -I/usr/include/x86_64-linux-gnu/qt5/Qt3DInput -I/usr/include/x86_64-linux-gnu/qt5/Qt3DLogic -I/usr/include/x86_64-linux-gnu/qt5/Qt3DCore -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../MyOpenGLChart.h -o moc_MyOpenGLChart.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -544,12 +555,19 @@ GanttView.o: ../GanttView.cpp ../GanttView.h \
 		../GanttBarItem.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o GanttView.o ../GanttView.cpp
 
+MyOpenGLChart.o: ../MyOpenGLChart.cpp ../MyOpenGLChart.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MyOpenGLChart.o ../MyOpenGLChart.cpp
+
 main.o: ../main.cpp ../GanttView.h \
-		../GanttDB.h
+		../GanttDB.h \
+		../MyOpenGLChart.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../main.cpp
 
 moc_GanttView.o: moc_GanttView.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_GanttView.o moc_GanttView.cpp
+
+moc_MyOpenGLChart.o: moc_MyOpenGLChart.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_MyOpenGLChart.o moc_MyOpenGLChart.cpp
 
 ####### Install
 
