@@ -500,101 +500,6 @@ void GanttView::snapBarsToAxis() {
 
 bool GanttView::isEditMode() const { return m_beditMode; }
 
-//void GanttView::showAddBarDialog() {
-//    QDialog dialog;
-//    dialog.setWindowTitle("Добавить новый бар");
-
-//    QFormLayout form(&dialog);
-
-//    QLineEdit *jobIdEdit = new QLineEdit(&dialog);
-//    QLineEdit *machineIdEdit = new QLineEdit(&dialog);
-//    QLineEdit *startTimeEdit = new QLineEdit(&dialog);
-//    QLineEdit *durationEdit = new QLineEdit(&dialog);
-//    QLineEdit *setupTimeEdit = new QLineEdit(&dialog);
-//    QLineEdit *costEdit = new QLineEdit(&dialog);
-//    QLineEdit *innerLabelEdit = new QLineEdit(&dialog);
-//    QLineEdit *predsEdit = new QLineEdit(&dialog);
-
-//    QComboBox *graphSelect = new QComboBox(&dialog);
-//    graphSelect->addItem("Верхний (Machines)");
-//    graphSelect->addItem("Нижний (Jobs)");
-
-//    form.addRow("Job ID:", jobIdEdit);
-//    form.addRow("Machine ID:", machineIdEdit);
-//    form.addRow("Start time:", startTimeEdit);
-//    form.addRow("Duration:", durationEdit);
-//    form.addRow("Setup time:", setupTimeEdit);
-//    form.addRow("Cost:", costEdit);
-//    form.addRow("Label:", innerLabelEdit);
-//    form.addRow("Предшественники (через запятую):", predsEdit);
-//    form.addRow("График:", graphSelect);
-
-//    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
-//    form.addRow(&buttonBox);
-
-//    QObject::connect(&buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
-//    QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
-
-//    if (dialog.exec() == QDialog::Accepted) {
-//        int jobId = jobIdEdit->text().toInt();
-//        int machineId = machineIdEdit->text().toInt();
-//        int startTime = startTimeEdit->text().toInt();
-//        int duration = durationEdit->text().toInt();
-//        int setupTime = setupTimeEdit->text().toInt();
-//        int cost = costEdit->text().toInt();
-//        QString innerLabel = innerLabelEdit->text();
-//        QStringList predsList = predsEdit->text().split(",", Qt::SkipEmptyParts);
-
-//        int newIdNum = 1;
-//        for (const auto& op : m_pDB->topOperations + m_pDB->bottomOperations) {
-//            bool ok = false;
-//            int num = op.id.section("_", 0, 0).toInt(&ok);
-//            if (ok && num >= newIdNum) {
-//                newIdNum = num + 1;
-//            }
-//        }
-
-//        QString suffix = (graphSelect->currentIndex() == 0) ? "up" : "down";
-//        QString newId = QString("%1_%2").arg(newIdNum).arg(suffix);
-
-//        OperationData newOp;
-//        newOp.id = newId;
-//        newOp.jobId = jobId;
-//        newOp.machineId = machineId;
-//        newOp.startTime = startTime;
-//        newOp.duration = duration;
-//        newOp.setupTime = setupTime;
-//        newOp.cost = cost;
-//        newOp.predecessors = predsList;
-
-//        if (graphSelect->currentIndex() == 0) {
-//            m_pDB->topOperations.append(newOp);
-//        } else {
-//            m_pDB->bottomOperations.append(newOp);
-//        }
-
-//        // Перерисовываем оба
-//        if (m_pDB->topView) {
-//            m_pDB->topView->m_operations = m_pDB->topOperations;
-//            m_pDB->topView->populateScene();
-//        }
-//        if (m_pDB->bottomView) {
-//            m_pDB->bottomView->m_operations = m_pDB->bottomOperations;
-//            m_pDB->bottomView->populateScene();
-//        }
-
-//        // Подсветить предшественников
-//        if (graphSelect->currentIndex() == 0 && m_pDB->topView) {
-//            m_pDB->topView->printLinkedOperations(newOp.id, newOp.jobId, newOp.startTime, newOp.duration);
-//        }
-//        if (graphSelect->currentIndex() == 1 && m_pDB->bottomView) {
-//            m_pDB->bottomView->printLinkedOperations(newOp.id, newOp.jobId, newOp.startTime, newOp.duration);
-//        }
-
-//    }
-//}
-
-
 void GanttView::showAddBarDialog() {
     QDialog dialog;
     dialog.setWindowTitle("Добавить новый бар");
@@ -607,7 +512,8 @@ void GanttView::showAddBarDialog() {
     QLineEdit *durationEdit = new QLineEdit(&dialog);
     QLineEdit *setupTimeEdit = new QLineEdit(&dialog);
     QLineEdit *costEdit = new QLineEdit(&dialog);
-    QLineEdit *nameEdit = new QLineEdit(&dialog);
+    QLineEdit *innerLabelEdit = new QLineEdit(&dialog);
+    QLineEdit *nameEdit = new QLineEdit(&dialog);              // ← добавляем поле Name
     QLineEdit *predsEdit = new QLineEdit(&dialog);
 
     QComboBox *graphSelect = new QComboBox(&dialog);
@@ -615,12 +521,13 @@ void GanttView::showAddBarDialog() {
     graphSelect->addItem("Нижний (Jobs)");
 
     form.addRow("Job ID:", jobIdEdit);
-    form.addRow("Machine ID (через запятую для нижнего):", machineIdEdit);
+    form.addRow("Machine ID:", machineIdEdit);
     form.addRow("Start time:", startTimeEdit);
     form.addRow("Duration:", durationEdit);
     form.addRow("Setup time:", setupTimeEdit);
     form.addRow("Cost:", costEdit);
-    form.addRow("Name:", nameEdit);
+    form.addRow("Label:", innerLabelEdit);
+    form.addRow("Name:", nameEdit);                            // ← добавляем в форму
     form.addRow("Предшественники (через запятую):", predsEdit);
     form.addRow("График:", graphSelect);
 
@@ -632,13 +539,13 @@ void GanttView::showAddBarDialog() {
 
     if (dialog.exec() == QDialog::Accepted) {
         int jobId = jobIdEdit->text().toInt();
-        QString machineIdsStr = machineIdEdit->text();
-        QStringList machineIdsList = machineIdsStr.split(",", Qt::SkipEmptyParts);
+        int machineId = machineIdEdit->text().toInt();
         int startTime = startTimeEdit->text().toInt();
         int duration = durationEdit->text().toInt();
         int setupTime = setupTimeEdit->text().toInt();
         int cost = costEdit->text().toInt();
-        QString name = nameEdit->text();
+        QString innerLabel = innerLabelEdit->text();
+        QString name = nameEdit->text();                       // ← считываем значение Name
         QStringList predsList = predsEdit->text().split(",", Qt::SkipEmptyParts);
 
         int newIdNum = 1;
@@ -656,27 +563,13 @@ void GanttView::showAddBarDialog() {
         OperationData newOp;
         newOp.id = newId;
         newOp.jobId = jobId;
+        newOp.machineId = machineId;
         newOp.startTime = startTime;
         newOp.duration = duration;
         newOp.setupTime = setupTime;
         newOp.cost = cost;
-        newOp.name = name;
+        newOp.name = name;                                    // ← устанавливаем name
         newOp.predecessors = predsList;
-
-        // Для верхнего графика
-        QString innerLabel;
-        if (graphSelect->currentIndex() == 0) {
-            newOp.machineId = machineIdsList.isEmpty() ? 0 : machineIdsList.first().toInt();
-            innerLabel = "J" + QString::number(jobId);
-        } else {
-            // Для нижнего графика
-            QStringList mLabels;
-            for (const QString& mid : machineIdsList) {
-                mLabels << "M" + mid.trimmed();
-            }
-            newOp.machineId = machineIdsList.isEmpty() ? 0 : machineIdsList.first().toInt();
-            innerLabel = mLabels.join(",");
-        }
 
         if (graphSelect->currentIndex() == 0) {
             m_pDB->topOperations.append(newOp);
@@ -702,20 +595,11 @@ void GanttView::showAddBarDialog() {
             m_pDB->bottomView->printLinkedOperations(newOp.id, newOp.jobId, newOp.startTime, newOp.duration);
         }
 
-        // Вывод для debug
-        qDebug() << "=== Добавлен новый бар ===";
-        qDebug() << "ID:" << newOp.id
-                 << "Job ID:" << newOp.jobId
-                 << "Machine ID:" << newOp.machineId
-                 << "Start:" << newOp.startTime
-                 << "Dur:" << newOp.duration
-                 << "Setup:" << newOp.setupTime
-                 << "Cost:" << newOp.cost
-                 << "Label (inner):" << innerLabel
-                 << "Name:" << newOp.name
-                 << "Preds:" << newOp.predecessors;
     }
 }
+
+
+
 
 
 QString GanttView::getTitle() const { return m_title; }  // ← добавь сюда

@@ -24,6 +24,7 @@ struct OperationData {
     int setupTime;
     QString name;
     int cost;
+//    QString innerLabelTex = ""
     QStringList predecessors;
     bool isHighlighted = false;  // <- добавляем поле
 };
