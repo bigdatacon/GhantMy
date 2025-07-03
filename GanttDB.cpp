@@ -304,3 +304,5 @@ void GanttDB::loadFromDatabase() {
     uniqueJobCountTop = jobsTop.size();
     uniqueJobCountBottom = jobsBottom.size();
 }
+
+QSqlDatabase GanttDB::getDatabase() const { return db; } // ← добавить

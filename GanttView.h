@@ -24,6 +24,7 @@ public:
 
      bool isEditMode() const;
      void showAddBarDialog();
+     QString getTitle() const ;
 
 
 

@@ -92,6 +92,28 @@ void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
                                           "Вы уверены, что хотите удалить этот бар?",
                                           QMessageBox::Yes | QMessageBox::No);
             if (reply == QMessageBox::Yes) {
+                // SQL-запрос удаления
+                QString tableName = currentView->getTitle().contains("Машин") ? "top_operations" : "bottom_operations";
+                QSqlQuery query(GanttDB::instance().getDatabase());
+                query.prepare(QString("DELETE FROM %1 WHERE id = ?").arg(tableName));
+                query.addBindValue(m_opId);
+                if (!query.exec()) {
+                    qWarning() << "Ошибка при удалении из БД:" << query.lastError().text();
+                } else {
+                    qDebug() << "Бар удалён из БД:" << m_opId;
+
+                    // Удаление из коллекции
+                    QVector<OperationData>& ops = tableName == "top_operations" ? GanttDB::instance().topOperations
+                                                                                : GanttDB::instance().bottomOperations;
+                    for (int i = 0; i < ops.size(); ++i) {
+                        if (ops[i].id == m_opId) {
+                            ops.remove(i);
+                            break;
+                        }
+                    }
+                }
+
+
                 scene()->removeItem(this);
                 delete this;
                 return;  // Важный момент — выходим сразу, чтобы не вызвать базовую обработку

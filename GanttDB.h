@@ -57,6 +57,7 @@ public:
     void loadFromJson(const QString &filename);
     void writeToDatabase();
     void loadFromDatabase();
+    QSqlDatabase getDatabase() const ;
 
 
     // 👇 Новые поля для доступа к GanttView

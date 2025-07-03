@@ -598,3 +598,6 @@ void GanttView::showAddBarDialog() {
 
     }
 }
+
+
+QString GanttView::getTitle() const { return m_title; }  // ← добавь сюда
