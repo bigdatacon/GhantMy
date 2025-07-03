@@ -244,6 +244,18 @@ void GanttDB::loadFromDatabase() {
         op.predecessors = query.value("predecessors").toString().split(",", Qt::SkipEmptyParts);
         topOperations.append(op);
         op.isHighlighted = query.value("isHighlighted").toInt() != 0;
+
+//        qDebug() << "Загружен бар (верхний):"
+//                 << "ID:" << op.id
+//                 << "Machine ID:" << op.machineId
+//                 << "Job ID:" << op.jobId
+//                 << "Start:" << op.startTime
+//                 << "Dur:" << op.duration
+//                 << "Setup:" << op.setupTime
+//                 << "Name:" << op.name
+//                 << "Cost:" << op.cost
+//                 << "Preds:" << op.predecessors
+//                 << "Highlighted:" << op.isHighlighted;
     }
 
     // Загрузка нижнего графика
@@ -261,6 +273,18 @@ void GanttDB::loadFromDatabase() {
         op.predecessors = query.value("predecessors").toString().split(",", Qt::SkipEmptyParts);
         bottomOperations.append(op);
         op.isHighlighted = query.value("isHighlighted").toInt() != 0;
+
+//        qDebug() << "Загружен бар (нижний):"
+//                 << "ID:" << op.id
+//                 << "Machine ID:" << op.machineId
+//                 << "Job ID:" << op.jobId
+//                 << "Start:" << op.startTime
+//                 << "Dur:" << op.duration
+//                 << "Setup:" << op.setupTime
+//                 << "Name:" << op.name
+//                 << "Cost:" << op.cost
+//                 << "Preds:" << op.predecessors
+//                 << "Highlighted:" << op.isHighlighted;
     }
 
     // Подсчёт максимального времени и уникальных jobId

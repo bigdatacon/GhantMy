@@ -6,8 +6,7 @@ class GanttBarItem :public QObject, public QGraphicsRectItem {
 public:
     GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
                                int timeUnit, int offsetX, int offsetY, int barHeight, QColor color, bool isHighlighted, int setupTime
-                 ,int cost, const QString &innerLabelTex );
-
+                 ,int cost, const QString &innerLabelTex, const QString &op_name );
 
     void setHighlighted(bool on);
     QString getOpId() const;
@@ -54,6 +53,7 @@ private:
 
 //    QString m_innerLabel = nullptr;
     QString m_innerLabel ;
+    QString m_q_op_name ;
 
 
     QTimer *m_pulseTimer = nullptr;

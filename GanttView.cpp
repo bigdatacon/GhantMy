@@ -210,7 +210,8 @@ void GanttView::populateScene() {
                 op.isHighlighted,
                 op.setupTime,
                 op.cost,
-                labelText
+                labelText,
+                op.name
             );
 
 
@@ -389,14 +390,6 @@ void GanttView::printLinkedOperations(const QString &opId, int jobId, int m_star
 }
 
 
-//void GanttView::clearHighlights() {
-//    for (QGraphicsItem *item : m_scene->items()) {
-//        if (auto *bar = dynamic_cast<GanttBarItem*>(item)) {
-//            bar->setHighlighted(false);
-//        }
-//    }
-//}
-
 
 void GanttView::clearHighlights() {
     // Сначала снимаем выделение у баров
@@ -505,124 +498,7 @@ void GanttView::snapBarsToAxis() {
 }
 
 
-
-
 bool GanttView::isEditMode() const { return m_beditMode; }
-
-
-//void GanttView::showAddBarDialog() {
-//    QDialog dialog;
-//    dialog.setWindowTitle("Добавить новый бар");
-
-//    QFormLayout form(&dialog);
-
-//    QLineEdit *jobIdEdit = new QLineEdit(&dialog);
-//    QLineEdit *startTimeEdit = new QLineEdit(&dialog);
-//    QLineEdit *durationEdit = new QLineEdit(&dialog);
-//    QLineEdit *setupTimeEdit = new QLineEdit(&dialog);
-//    QLineEdit *costEdit = new QLineEdit(&dialog);
-//    QLineEdit *innerLabelEdit = new QLineEdit(&dialog);
-//    QLineEdit *predsEdit = new QLineEdit(&dialog);
-
-//    QComboBox *graphSelect = new QComboBox(&dialog);
-//    graphSelect->addItem("Верхний (Machines)");
-//    graphSelect->addItem("Нижний (Jobs)");
-
-//    form.addRow("Job ID:", jobIdEdit);
-//    form.addRow("Start time:", startTimeEdit);
-//    form.addRow("Duration:", durationEdit);
-//    form.addRow("Setup time:", setupTimeEdit);
-//    form.addRow("Cost:", costEdit);
-//    form.addRow("Label:", innerLabelEdit);
-//    form.addRow("Предшественники (через запятую):", predsEdit);
-//    form.addRow("График:", graphSelect);
-
-//    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
-//    form.addRow(&buttonBox);
-
-//    QObject::connect(&buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
-//    QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
-
-//    if (dialog.exec() == QDialog::Accepted) {
-//        int jobId = jobIdEdit->text().toInt();
-//        int startTime = startTimeEdit->text().toInt();
-//        int duration = durationEdit->text().toInt();
-//        int setupTime = setupTimeEdit->text().toInt();
-//        int cost = costEdit->text().toInt();
-//        QString innerLabel = innerLabelEdit->text();
-//        QStringList predsList = predsEdit->text().split(",", Qt::SkipEmptyParts);
-
-//        qDebug() << "=== Добавление нового бара ===";
-//        qDebug() << "Введённые параметры:";
-//        qDebug() << "  Job ID:" << jobId;
-//        qDebug() << "  Start time:" << startTime;
-//        qDebug() << "  Duration:" << duration;
-//        qDebug() << "  Setup time:" << setupTime;
-//        qDebug() << "  Cost:" << cost;
-//        qDebug() << "  Label:" << innerLabel;
-//        qDebug() << "  Предшественники:" << predsList;
-//        qDebug() << "  График:" << (graphSelect->currentIndex() == 0 ? "Machines" : "Jobs");
-
-//        // Генерация ID
-//        int newIdNum = 1;
-//        for (const auto& op : m_pDB->topOperations + m_pDB->bottomOperations) {
-//            bool ok = false;
-//            int num = op.id.section("_", 0, 0).toInt(&ok);
-//            if (ok && num >= newIdNum) {
-//                newIdNum = num + 1;
-//            }
-//        }
-
-//        QString suffix = (graphSelect->currentIndex() == 0) ? "up" : "down";
-//        QString newId = QString("%1_%2").arg(newIdNum).arg(suffix);
-
-//        OperationData newOp;
-//        newOp.id = newId;
-//        newOp.jobId = jobId;
-//        newOp.startTime = startTime;
-//        newOp.duration = duration;
-//        newOp.setupTime = setupTime;
-//        newOp.cost = cost;
-//        newOp.name = innerLabel;
-//        newOp.machineId = jobId;  // если нужно, можно сделать отдельный ввод
-
-//        newOp.predecessors = predsList;
-
-//        qDebug() << "Параметры нового бара после обработки:";
-//        qDebug() << "  ID:" << newOp.id;
-//        qDebug() << "  Job ID:" << newOp.jobId;
-//        qDebug() << "  Start time:" << newOp.startTime;
-//        qDebug() << "  Duration:" << newOp.duration;
-//        qDebug() << "  Setup time:" << newOp.setupTime;
-//        qDebug() << "  Cost:" << newOp.cost;
-//        qDebug() << "  Name:" << newOp.name;
-//        qDebug() << "  Machine ID:" << newOp.machineId;
-//        qDebug() << "  Предшественники:" << newOp.predecessors;
-
-////        .arg(m_opId)
-////        .arg(m_machineId)
-////        .arg(m_jobId)
-////        .arg(m_startTime)
-////        .arg(m_duration)
-////        .arg(m_setupTime)
-////        .arg(m_innerLabel)
-////        .arg(m_icost);
-
-
-//        if (graphSelect->currentIndex() == 0) {
-//            m_pDB->topOperations.append(newOp);
-//        } else {
-//            m_pDB->bottomOperations.append(newOp);
-//        }
-
-//        m_operations = (graphSelect->currentIndex() == 0) ? m_pDB->topOperations : m_pDB->bottomOperations;
-//        populateScene();
-
-//        qDebug() << "✅ Бар успешно добавлен и сцена обновлена.";
-
-//        printLinkedOperations(newOp.id, newOp.jobId, newOp.startTime, newOp.duration);
-//    }
-//}
 
 void GanttView::showAddBarDialog() {
     QDialog dialog;
@@ -691,10 +567,10 @@ void GanttView::showAddBarDialog() {
         newOp.cost = cost;
         newOp.predecessors = predsList;
 
-        qDebug() << "=== Добавление нового бара ===";
-        qDebug() << "ID:" << newOp.id << "Job ID:" << newOp.jobId << "Machine ID:" << newOp.machineId
-                 << "Start:" << newOp.startTime << "Duration:" << newOp.duration << "Setup:" << newOp.setupTime
-                 << "Cost:" << newOp.cost << "Label:" << innerLabel << "Preds:" << newOp.predecessors;
+//        qDebug() << "=== Добавление нового бара ===";
+//        qDebug() << "ID:" << newOp.id << "Job ID:" << newOp.jobId << "Machine ID:" << newOp.machineId
+//                 << "Start:" << newOp.startTime << "Duration:" << newOp.duration << "Setup:" << newOp.setupTime
+//                 << "Cost:" << newOp.cost << "Label:" << innerLabel << "Preds:" << newOp.predecessors;
 
         if (graphSelect->currentIndex() == 0) {
             m_pDB->topOperations.append(newOp);

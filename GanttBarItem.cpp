@@ -11,52 +11,10 @@
 #include <QObject>
 
 
-//GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
-//                           int timeUnit, int offsetX, int offsetY, int passedBarHeight,
-//                           QColor color, bool isHighlighted, int setupTime, int cost, const QString &innerLabelTex)
-//    : m_opId(id),
-//      m_jobId(jobId),
-//      m_startTime(startTime),
-//      m_duration(duration),
-//      m_itimeUnit(timeUnit),
-//      m_isetupTime(setupTime),
-//      m_defaultColor(Qt::blue),
-//      m_assignedColor(color),
-//      m_bisHighlighted(isHighlighted),
-//      m_isManuallyHighlighted(isHighlighted),
-//      m_icost(cost),
-//      m_innerLabel(innerLabelTex)
-//{
-//    int x = offsetX + startTime * timeUnit;
-//    int width = duration * timeUnit;
-
-//    setRect(x, offsetY, width, passedBarHeight);
-//    setBrush(isHighlighted ? Qt::yellow : m_assignedColor);
-////    setFlag(ItemIsMovable);
-
-//    // Было
-//    setFlag(ItemIsMovable);
-
-//    // Стало
-//    setFlag(ItemIsMovable, false); // По умолчанию не двигается
-
-
-//    setFlag(ItemSendsGeometryChanges);
-//    setAcceptHoverEvents(true);
-
-//    m_pulseTimer = new QTimer();
-//    QObject::connect(m_pulseTimer, &QTimer::timeout, this, [this]() {
-////        m_currentAlpha = 0.5 + 0.5 * std::sin(QDateTime::currentMSecsSinceEpoch() / (200.0 - m_icost));
-//        double amplitude = std::min(0.8, 0.3 + m_icost / 500.0);
-//        m_currentAlpha = 0.2 + amplitude * (0.5 + 0.5 * std::sin(QDateTime::currentMSecsSinceEpoch() / (200.0 - m_icost)));
-
-//        update();
-//    });
-//}
-
 GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, int duration,
                            int timeUnit, int offsetX, int offsetY, int passedBarHeight,
-                           QColor color, bool isHighlighted, int setupTime, int cost, const QString &innerLabelTex)
+                           QColor color, bool isHighlighted, int setupTime, int cost, const QString &innerLabelTex,
+                           const QString &op_name )
     : m_opId(id),
       m_imachineId(machineId),  // ✅ теперь сохраняем
       m_jobId(jobId),
@@ -69,7 +27,8 @@ GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, 
       m_bisHighlighted(isHighlighted),
       m_isManuallyHighlighted(isHighlighted),
       m_icost(cost),
-      m_innerLabel(innerLabelTex)
+      m_innerLabel(innerLabelTex),
+      m_q_op_name(op_name)
 {
     int x = offsetX + startTime * timeUnit;
     int width = duration * timeUnit;
@@ -97,11 +56,6 @@ GanttBarItem::GanttBarItem(QString id, int machineId, int jobId, int startTime, 
         update();
     });
 }
-
-
-
-
-
 
 void GanttBarItem::setHighlighted(bool on) {
     m_isManuallyHighlighted = on;
@@ -149,17 +103,7 @@ void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
     if (event->button() == Qt::RightButton) {
         // Формируем текст с инфо
-//        QString info = QString("ID: %1\nMachine ID: %2\nJob ID: %3\nStart: %4\nDuration: %5\nSetup: %6\nName: %7\nCost: %8")
-//                .arg(m_opId)
-////                .arg(m_imachineId)
-//                .arg(m_jobId)
-//                .arg(m_startTime)
-//                .arg(m_duration)
-//                .arg(m_setupTime)
-////                .arg(m_name)
-//                .arg(m_icost);
-
-        QString info = QString("ID: %1\nMachine ID: %2\nJob ID: %3\nStart: %4\nDuration: %5\nSetup: %6\nLabel: %7\nCost: %8")
+        QString info = QString("ID: %1\nMachine ID: %2\nJob ID: %3\nStart: %4\nDuration: %5\nSetup: %6\nLabel: %7\nCost: %8\nName: %9")
                 .arg(m_opId)
                 .arg(m_imachineId)
                 .arg(m_jobId)
@@ -167,9 +111,8 @@ void GanttBarItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
                 .arg(m_duration)
                 .arg(m_setupTime)
                 .arg(m_innerLabel)
-                .arg(m_icost);
-
-
+                .arg(m_icost)
+                .arg(m_q_op_name);
 
         QMessageBox::information(nullptr, "Информация о баре", info);
         return; // Чтобы не обрабатывать дальше
