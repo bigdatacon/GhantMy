@@ -130,6 +130,11 @@ int main(int argc, char *argv[]) {
     menuLayout->addWidget(refreshButton);
     QPushButton *editModeBtn = new QPushButton("Edit Mode");
     QPushButton *viewModeBtn = new QPushButton("View Mode");
+
+    QPushButton *saveButton = new QPushButton("Сохранить изменения");
+    menuLayout->addWidget(saveButton);
+
+
     //кнопка добавить бар
     QPushButton *addBarButton = new QPushButton("Add Bar");
     menuLayout->addWidget(addBarButton);
@@ -216,6 +221,52 @@ int main(int argc, char *argv[]) {
         }
     });
 
+    QObject::connect(saveButton, &QPushButton::clicked, [&]() {
+        qDebug() << "==== Сохраняем текущие данные в БД ====";
+
+        // Сохраняем текущие данные в БД
+        GanttDB::instance().writeToDatabase();
+
+        // Перезагружаем из БД (для проверки)
+        GanttDB::instance().loadFromDatabase();
+
+        // Обновляем графики
+        if (GanttDB::instance().topView) {
+            GanttDB::instance().topView->updateOperations(GanttDB::instance().topOperations);
+        }
+        if (GanttDB::instance().bottomView) {
+            GanttDB::instance().bottomView->updateOperations(GanttDB::instance().bottomOperations);
+        }
+
+        // Выводим debug
+        qDebug() << "--- TOP OPERATIONS ---";
+        for (const auto &op : GanttDB::instance().topOperations) {
+            qDebug() << "ID:" << op.id
+                     << "Machine:" << op.machineId
+                     << "Job:" << op.jobId
+                     << "Start:" << op.startTime
+                     << "Dur:" << op.duration
+                     << "Setup:" << op.setupTime
+                     << "Name:" << op.name
+                     << "Cost:" << op.cost
+                     << "Preds:" << op.predecessors;
+        }
+
+        qDebug() << "--- BOTTOM OPERATIONS ---";
+        for (const auto &op : GanttDB::instance().bottomOperations) {
+            qDebug() << "ID:" << op.id
+                     << "Machine:" << op.machineId
+                     << "Job:" << op.jobId
+                     << "Start:" << op.startTime
+                     << "Dur:" << op.duration
+                     << "Setup:" << op.setupTime
+                     << "Name:" << op.name
+                     << "Cost:" << op.cost
+                     << "Preds:" << op.predecessors;
+        }
+
+        qDebug() << "=== Сохранение и проверка завершены ===";
+    });
 
 
     mainWidget.show();

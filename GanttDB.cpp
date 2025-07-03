@@ -216,7 +216,7 @@ void GanttDB::writeToDatabase() {
     insertOps(topOperations, "top_operations");
     insertOps(bottomOperations, "bottom_operations");
 
-//    qDebug() << "Данные успешно записаны в базу.";
+    qDebug() << "Данные успешно записаны в базу.";
 }
 
 
