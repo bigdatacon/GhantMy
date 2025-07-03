@@ -180,36 +180,37 @@ int main(int argc, char *argv[]) {
     });
 
 
-    QObject::connect(btn3D, &QPushButton::clicked, [&]() {
-        QVector<BarData> bars;
-        for (const auto &op : GanttDB::instance().topOperations) {
-            BarData bar;
-            bar.id = op.id;
-            bar.cost = op.cost;
-            bars.append(bar);
-        }
+    // Кнопка 3D-графика
+        QObject::connect(btn3D, &QPushButton::clicked, [&]() {
+            QVector<BarData> bars;
+            for (const auto &op : GanttDB::instance().topOperations) {
+                BarData bar;
+                bar.id = op.id;
+                bar.cost = op.cost;
+                bars.append(bar);
+            }
 
-        // Окно
-        QWidget *window = new QWidget();
-        window->setWindowTitle("OpenGL 3D Cost Chart");
-        QVBoxLayout *layout = new QVBoxLayout(window);
+            // Окно
+            QWidget *window = new QWidget();
+            window->setWindowTitle("OpenGL 3D Cost Chart");
+            QVBoxLayout *mainLayout = new QVBoxLayout(window);
 
-        // OpenGL виджет
-        MyOpenGLChart *chart = new MyOpenGLChart(bars);
-        layout->addWidget(chart, 1);
+            // OpenGL виджет
+            MyOpenGLChart *chart = new MyOpenGLChart(bars);
+            mainLayout->addWidget(chart, 8);
 
-        // Горизонтальная линия с подписями
-        QHBoxLayout *labelsLayout = new QHBoxLayout();
-        for (const BarData &bar : bars) {
-            QLabel *label = new QLabel(QString("ID:%1\nCost:%2").arg(bar.id).arg(bar.cost));
-            label->setAlignment(Qt::AlignCenter);
-            labelsLayout->addWidget(label);
-        }
-        layout->addLayout(labelsLayout);
+            // Layout с подписями
+            QHBoxLayout *labelsLayout = new QHBoxLayout();
+            for (const BarData &bar : bars) {
+                QLabel *label = new QLabel(QString("ID:%1\nCost:%2").arg(bar.id).arg(bar.cost));
+                label->setAlignment(Qt::AlignCenter);
+                labelsLayout->addWidget(label);
+            }
+            mainLayout->addLayout(labelsLayout, 1);
 
-        window->resize(1000, 600);
-        window->show();
-    });
+            window->resize(1000, 600);
+            window->show();
+        });
 
 
 
