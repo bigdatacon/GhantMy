@@ -1,105 +1,4 @@
 
-// main.cpp
-#include <QApplication>
-#include <QSplitter>
-#include <QVBoxLayout>
-#include <QWidget>
-#include "GanttView.h"
-#include "GanttDB.h"
-#include <QPushButton>
-
-
-
-
-//int main(int argc, char *argv[]) {
-//    QApplication app(argc, argv);
-
-//    GanttDB::instance().loadFromJson("operations.json");
-
-//    GanttDB::instance().writeToDatabase();
-//    GanttDB::instance().loadFromDatabase();
-
-//    QWidget mainWidget;
-//    mainWidget.setWindowTitle("Диаграмма Ганта — два графика + зум");
-//    mainWidget.resize(1000, 800);
-
-//    QVBoxLayout *layout = new QVBoxLayout(&mainWidget);
-//    GanttView *topChart = new GanttView("График Машин", GanttDB::instance().topOperations, &GanttDB::instance(), GanttDB::instance().maxFinishTop, GanttDB::instance().uniqueJobCountTop);
-//    GanttView *bottomChart = new GanttView("График Работ", GanttDB::instance().bottomOperations, &GanttDB::instance(), GanttDB::instance().maxFinishBottom, GanttDB::instance().uniqueJobCountBottom);
-
-////    GanttDB& db = GanttDB::instance();
-//    GanttDB::instance().topView = topChart;
-//    GanttDB::instance().bottomView = bottomChart;
-
-
-//    QSplitter *splitter = new QSplitter(Qt::Vertical);
-//    topChart->setMinimumHeight(400);
-//    bottomChart->setMinimumHeight(400);
-
-//    splitter->addWidget(topChart);
-//    splitter->addWidget(bottomChart);
-//    splitter->setStretchFactor(0, 1);
-//    splitter->setStretchFactor(1, 1);
-
-//    layout->addWidget(splitter);
-
-//    mainWidget.show();
-//    return app.exec();
-//}
-
-//#include <QApplication>
-//#include <QSplitter>
-//#include <QVBoxLayout>
-//#include <QWidget>
-//#include <QPushButton>
-//#include <QHBoxLayout>
-//#include "GanttView.h"
-//#include "GanttDB.h"
-
-//int main(int argc, char *argv[]) {
-//    QApplication app(argc, argv);
-
-//    GanttDB::instance().loadFromJson("operations.json");
-//    GanttDB::instance().writeToDatabase();
-//    GanttDB::instance().loadFromDatabase();
-
-//    QWidget mainWidget;
-//    mainWidget.setWindowTitle("Диаграмма Ганта — два графика + меню");
-//    mainWidget.resize(1000, 800);
-
-//    // Верхняя панель с кнопками
-//    QWidget *menuWidget = new QWidget();
-//    QHBoxLayout *menuLayout = new QHBoxLayout(menuWidget);
-//    QPushButton *showCostButton = new QPushButton("ShowCost");
-//    menuLayout->addWidget(showCostButton);
-//    menuLayout->addStretch(); // Чтобы кнопка ушла влево
-
-//    // Графики
-//    GanttView *topChart = new GanttView("График Машин", GanttDB::instance().topOperations, &GanttDB::instance(), GanttDB::instance().maxFinishTop, GanttDB::instance().uniqueJobCountTop);
-//    GanttView *bottomChart = new GanttView("График Работ", GanttDB::instance().bottomOperations, &GanttDB::instance(), GanttDB::instance().maxFinishBottom, GanttDB::instance().uniqueJobCountBottom);
-
-//    GanttDB::instance().topView = topChart;
-//    GanttDB::instance().bottomView = bottomChart;
-
-//    // Сплиттер для графиков
-//    QSplitter *splitter = new QSplitter(Qt::Vertical);
-//    topChart->setMinimumHeight(400);
-//    bottomChart->setMinimumHeight(400);
-//    splitter->addWidget(topChart);
-//    splitter->addWidget(bottomChart);
-//    splitter->setStretchFactor(0, 1);
-//    splitter->setStretchFactor(1, 1);
-
-//    // Основный лэйаут
-//    QVBoxLayout *layout = new QVBoxLayout(&mainWidget);
-//    layout->addWidget(menuWidget);    // Добавляем меню сверху
-//    layout->addWidget(splitter);      // Графики снизу
-
-//    mainWidget.show();
-//    return app.exec();
-//}
-
-
 #include <QApplication>
 #include <QSplitter>
 #include <QVBoxLayout>
@@ -108,6 +7,7 @@
 #include <QHBoxLayout>
 #include "GanttView.h"
 #include "GanttDB.h"
+#include <QObject>
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
@@ -133,6 +33,13 @@ int main(int argc, char *argv[]) {
 
     QPushButton *saveButton = new QPushButton("Сохранить изменения");
     menuLayout->addWidget(saveButton);
+
+    QPushButton *btn3D = new QPushButton("Открыть 3D график");
+    menuLayout->addWidget(btn3D);
+
+
+
+
 
 
     //кнопка добавить бар
@@ -267,6 +174,10 @@ int main(int argc, char *argv[]) {
 
         qDebug() << "=== Сохранение и проверка завершены ===";
     });
+
+
+    QObject::connect(btn3D, &QPushButton::clicked, GanttDB::instance().topView, &GanttView::show3DCostChart);
+
 
 
     mainWidget.show();

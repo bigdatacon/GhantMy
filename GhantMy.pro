@@ -1,5 +1,7 @@
 QT       += core gui
 QT += sql
+QT += 3dcore 3drender 3dinput 3dextras
+QT += 3dcore 3drender 3dinput 3dextras 3danimation
 
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets

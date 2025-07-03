@@ -26,6 +26,8 @@ public:
      void showAddBarDialog();
      QString getTitle() const ;
 
+     void show3DCostChart();
+
 
 
 protected:

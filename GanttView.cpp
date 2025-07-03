@@ -599,7 +599,93 @@ void GanttView::showAddBarDialog() {
 }
 
 
-
-
-
 QString GanttView::getTitle() const { return m_title; }  // ← добавь сюда
+
+
+
+///////////////////////VISUALIZATION////////
+
+#include <Qt3DExtras/Qt3DWindow>
+#include <Qt3DCore/QEntity>
+#include <Qt3DRender/QCamera>
+#include <Qt3DExtras/QOrbitCameraController>
+#include <Qt3DExtras/QPhongMaterial>
+#include <Qt3DExtras/QCuboidMesh>
+#include <Qt3DCore/QTransform>
+#include <QPropertyAnimation>
+#include <QEasingCurve>
+
+void GanttView::show3DCostChart()
+{
+    // Создаём 3D окно
+    Qt3DExtras::Qt3DWindow *view = new Qt3DExtras::Qt3DWindow();
+//    view->defaultFrameGraph()->setClearColor(Qt::black);
+
+
+    QWidget *container = QWidget::createWindowContainer(view);
+    container->setMinimumSize(QSize(800, 600));
+    container->setWindowTitle("3D Cost Chart");
+    container->show();
+
+    // Корневая сущность
+    Qt3DCore::QEntity *rootEntity = new Qt3DCore::QEntity();
+
+    // Камера
+    Qt3DRender::QCamera *camera = view->camera();
+    camera->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.1f, 1000.0f);
+    camera->setPosition(QVector3D(0, 20, 40));
+    camera->setViewCenter(QVector3D(0, 0, 0));
+
+    // Управление камерой
+    Qt3DExtras::QOrbitCameraController *camController = new Qt3DExtras::QOrbitCameraController(rootEntity);
+    camController->setLinearSpeed(50.0f);
+    camController->setLookSpeed(180.0f);
+    camController->setCamera(camera);
+
+    // Цвета
+    QList<QColor> colors = {Qt::red, Qt::green, Qt::blue, Qt::yellow, Qt::cyan, Qt::magenta, Qt::gray, Qt::white};
+
+    // Сортируем операции по стоимости
+    QVector<OperationData> ops = m_pDB->topOperations;
+    std::sort(ops.begin(), ops.end(), [](const OperationData &a, const OperationData &b) {
+        return a.cost < b.cost;
+    });
+
+    int index = 0;
+    for (const OperationData &op : ops)
+    {
+        // Куб
+        Qt3DExtras::QCuboidMesh *cube = new Qt3DExtras::QCuboidMesh();
+
+        // Материал
+        Qt3DExtras::QPhongMaterial *material = new Qt3DExtras::QPhongMaterial(rootEntity);
+        QColor color = colors[index % colors.size()];
+        material->setDiffuse(color);
+
+        // Трансформация
+        Qt3DCore::QTransform *transform = new Qt3DCore::QTransform();
+        float scaleY = std::max(1.0f, op.cost / 20.0f);
+        transform->setScale3D(QVector3D(1.0f, scaleY, 1.0f));
+        transform->setTranslation(QVector3D(index * 3.0f, scaleY / 2.0f, 0.0f));
+
+        // Анимация
+        QPropertyAnimation *animation = new QPropertyAnimation(transform, "scale3D");
+        animation->setStartValue(QVector3D(1.0f, 0.0f, 1.0f));
+        animation->setEndValue(QVector3D(1.0f, scaleY, 1.0f));
+        animation->setDuration(1500);
+        animation->setEasingCurve(QEasingCurve::OutBounce);
+        animation->start(QAbstractAnimation::DeleteWhenStopped);
+
+        // Сущность бара
+        Qt3DCore::QEntity *barEntity = new Qt3DCore::QEntity(rootEntity);
+        barEntity->addComponent(cube);
+        barEntity->addComponent(material);
+        barEntity->addComponent(transform);
+
+        ++index;
+    }
+
+    // Устанавливаем корень
+    view->setRootEntity(rootEntity);
+}
+
